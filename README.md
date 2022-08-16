@@ -16,7 +16,7 @@ It reads hexadecimal values, deal with parenthesis, and warns the user when this
 
 
 2. DUPLICATE FILENAME FINDER (initially called 'folder compare')
-![Duplicate1](https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/filenamesearcher_capture.png)
+![Duplicate1](https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/DuplicateFilenameSearcher.PNG)
 Have you ever wondered how you could look for file with the same name, different content, and that are in 2 seperate folders at the same time ?
 I have the solution for you in my project : folder compare.
 First you have to type the reference folder, which represents the main folder from which the files origin.

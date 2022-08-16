@@ -9,6 +9,7 @@ Here is the list of the tools :
 This is my most prominent project.
 This project import all macros from a file or from a folder and has an option integrated to it to look for the value of the related macro.
 It has a nice interface and a help menu.
+<img src="https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/MacroParser2.png" width=75% height=75%>
 It reads hexadecimal values, deal with parenthesis, and warns the user when this one uses a macro that has multiple definition.
 
 2. DUPLICATE FILE FINDER (initially called 'folder compare')

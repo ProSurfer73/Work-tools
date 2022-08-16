@@ -1,0 +1,3 @@
+Please double-Click on the exe files provided in the folder:
+
+ProjectName / bin / Release / *.exe

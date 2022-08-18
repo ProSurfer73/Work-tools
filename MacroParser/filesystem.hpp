@@ -10,8 +10,18 @@
 #include <thread>
 #include <mutex>
 
+#include <iomanip>
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <windows.h>
+#include <iostream>
+#include <thread>
+#include <mutex>
 #include "stringeval.hpp"
 #include "config.hpp"
+
+//#define ENABLE_MUTEX_LOADINGBAR
 
 using namespace std;
 

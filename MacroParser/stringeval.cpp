@@ -145,6 +145,7 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
                 if(p.first.find('(') != string::npos && p.first.find(')') == string::npos
                 || p.first.find('(') == string::npos && p.first.find(')') != string::npos){
                     // Then there is a problem, we stop the evaluation here.
+
                     return false;
                 }
 

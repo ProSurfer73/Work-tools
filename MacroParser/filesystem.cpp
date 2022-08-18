@@ -50,7 +50,6 @@ bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defi
 
     char characterRead;
 
-    bool isLineComment=false;
     int posLineComment=0;
 
     while(file.get(characterRead))
@@ -133,7 +132,10 @@ bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defi
                     }
                 }
 
-                if(str2.find("#define") == string::npos)
+                // Do not import macros containing errors
+                if(str2.find("#define") == string::npos
+                && !((str1.find('(') != string::npos && str1.find(')') == string::npos)
+                || (str1.find('(') == string::npos && str1.find(')') != string::npos)))
                 {
                     // Add the couple to the define list
                     defineList.emplace_back( str1, str2 );
@@ -259,11 +261,8 @@ void explore_directory(std::string directory_name, stringvec& fileCollection)
 
 #ifdef ENABLE_FILE_LOADING_BAR
 
-static std::mutex mymutex;
-static bool ended;
-static unsigned nbFiles;
 
-static void printNbFilesLoaded()
+static void printNbFilesLoaded(std::mutex& mymutex, bool& ended, unsigned& nbFiles, const unsigned maxNbFiles)
 {
     // First initial delay before starting to diplay loading status
 
@@ -292,13 +291,21 @@ static void printNbFilesLoaded()
 
         if(notEverytime == 10)
         {
-            #ifdef DEBUG_LOG_FILE_IMPORT
+            #if (defined DEBUG_LOG_FILE_IMPORT && !(defined DEBUG_LOG_FILE_IMPORT)) && defined ENABLE_MUTEX_LOADINGBAR
+                mymutex.lock();
+                unsigned currentNbFiles = nbFiles;
+                mymutex.unlock();
+            #else
+                unsigned currentNbFiles = nbFiles;
+            #endif
+
+            #if defined DEBUG_LOG_FILE_IMPORT && defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
             mymutex.lock();
             #endif // DEBUG_LOG_FILE_IMPORT
 
-            cout << nbFiles << " files are loaded for now.\n";
+            cout << '[' << currentNbFiles*100/static_cast<float>(maxNbFiles) << "%] " << currentNbFiles << " files over " << maxNbFiles << " are loaded.\n";
 
-            #ifdef DEBUG_LOG_FILE_IMPORT
+            #if defined DEBUG_LOG_FILE_IMPORT && defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
             mymutex.unlock();
             #endif // DEBUG_LOG_FILE_IMPORT
 
@@ -329,10 +336,12 @@ bool readDirectory(string dir, vector< pair<string, string> >& defineList, strin
         return false;
 
     #ifdef ENABLE_FILE_LOADING_BAR
-    ended = false;
-    nbFiles = 0;
+    std::cout << std::setprecision(3);
+    bool ended = false;
     unsigned localNbFile = 0;
-    std::thread tr(printNbFilesLoaded);
+    unsigned nbFiles = 0;
+    std::mutex mymutex;
+    std::thread tr = std::thread(printNbFilesLoaded, std::ref(mymutex), std::ref(ended), std::ref(nbFiles), fileCollection.size());
     #endif
 
     for(string str: fileCollection)
@@ -351,10 +360,14 @@ bool readDirectory(string dir, vector< pair<string, string> >& defineList, strin
         #endif
 
         #ifdef ENABLE_FILE_LOADING_BAR
+            #ifdef ENABLE_MUTEX_LOADINGBAR
             mymutex.lock();
+            #endif
             nbFiles = localNbFile;
+            #ifdef ENABLE_MUTEX_LOADINGBAR
             mymutex.unlock();
             #endif
+        #endif
     }
 
     #ifdef ENABLE_FILE_LOADING_BAR

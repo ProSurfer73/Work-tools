@@ -2,10 +2,6 @@
 #define STRINGEVAL_HPP
 
 
-
-
-
-
 #include <vector>
 #include <string>
 #include <sstream>
@@ -19,9 +15,11 @@ using namespace std;
 
 void clearSpaces(string& str);
 
+bool doesExprLookOk(const string& expr);
+
 double evaluateArithmeticExpr(const std::string& expr);
 
-bool calculateExpression(string& expr, const vector< pair<string,string> >& dictionary, const vector<string>& redefinedMacros);
+bool calculateExpression(string& expr, const vector< pair<string,string> >& dictionary, const vector<string>& redefinedMacros, const vector<string>& incorrectMacros, bool& shouldDisplayPbInfo);
 
 
 #endif // STRINGEVAL_HPP

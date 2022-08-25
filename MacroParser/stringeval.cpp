@@ -39,6 +39,34 @@ static void func(double &result, char op, double num)
     }
 }
 
+bool doesExprLookOk(const string& expr)
+{
+    // Check parenthesis
+    int remainingParenthesis=0;
+    for(unsigned i=0; i<expr.size(); ++i){
+        if(expr[i]=='(')
+            remainingParenthesis++;
+        if(expr[i]==')'){
+            remainingParenthesis--;
+            if(remainingParenthesis<0)
+                return false;
+        }
+    }
+    if(remainingParenthesis!=0)
+        return false;
+
+
+    // Two operator in a row => incorrect
+    for(unsigned i=1; i<expr.size(); ++i){
+        if(isOperationCharacter(expr[i]) && isOperationCharacter(expr[i-1]))
+            return false;
+    }
+
+
+
+    return true;
+}
+
 // The arithmetic expression must be correct and must NOT contain spaces.
 double evaluateArithmeticExpr(const string& expr)
 {
@@ -70,7 +98,7 @@ double evaluateArithmeticExpr(const string& expr)
  *
  */
 
-bool calculateExpression(string& expr, const vector< pair<string,string> >& dictionary, const vector<string>& redefinedMacros)
+bool calculateExpression(string& expr, const vector< pair<string,string> >& dictionary, const vector<string>& redefinedMacros, const vector<string>& incorrectMacros, bool& shouldDisplayPbInfo)
 {
     /// 0. Is the expression okay ?
 
@@ -142,8 +170,8 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
                 #endif // DEBUG_LOG_STRINGEVAL
 
                 // If replacement strings aren't correct
-                if(p.first.find('(') != string::npos && p.first.find(')') == string::npos
-                || p.first.find('(') == string::npos && p.first.find(')') != string::npos){
+                if((p.first.find('(') != string::npos && p.first.find(')') == string::npos)
+                || (p.first.find('(') == string::npos && p.first.find(')') != string::npos)){
                     // Then there is a problem, we stop the evaluation here.
 
                     return false;
@@ -151,8 +179,16 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
 
                 expr = std::regex_replace(expr, std::regex(p.first), p.second); // replace 'def' -> 'klm'
 
-                if(std::find(redefinedMacros.begin(), redefinedMacros.end(), p.first) != redefinedMacros.end())
-                    cout << "/!\\ You are using a redefined version of : " << p.first << endl;
+                if(std::find(redefinedMacros.begin(), redefinedMacros.end(), p.first) != redefinedMacros.end()){
+                    cout << "/!\\ Warning: the macro " << p.first << " you are using have been redefined /!\\" << endl;
+                    shouldDisplayPbInfo = true;
+                }
+
+                if(std::find(incorrectMacros.begin(), incorrectMacros.end(), p.first) != incorrectMacros.end()){
+                    cout << "/!\\ Warning: the macro " << p.first << "you are using seem incorrect. /!\\" << endl;
+                    shouldDisplayPbInfo = true;
+                }
+
 
                 break;
             }
@@ -319,7 +355,7 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
             clearSpaces(expr);
         }
 
-        if(!(expr.find('(') == string::npos && expr.find(')') == string::npos))
+        if(!doesExprLookOk(expr))
             return false;
 
 

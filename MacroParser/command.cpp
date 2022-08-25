@@ -10,13 +10,12 @@ void printHelp()
     cout << "- look [macro] : calculate the value of a macro given in input" << endl;
     cout << "- define [macro] [value] : add/replace a specific macro" << endl;
     cout << "- search [name] : print all macros containing the string name" << endl;
-    cout << "- listre : print the list of the macros that have been redefined" << endl;
-    cout << "- list : print the list of non-redefined macros" << endl;
+    cout << "- listok/listre/listin : print the list of okay/redefined/incorrect macros" << endl;
     cout << "- clean : delete all macros registered" << endl;
     cout << "- exit : quit the program" << endl;
 }
 
-void dealWithUser(vector< pair<string, string> >& defines, vector<string>& redefinedMacros)
+void dealWithUser(MacroContainer& macroContainer)
 {
     bool running=true;
 
@@ -27,49 +26,60 @@ void dealWithUser(vector< pair<string, string> >& defines, vector<string>& redef
         string userInput;
         getline(cin, userInput);
 
-        running = runCommand(userInput, defines, redefinedMacros);
+        running = runCommand(userInput, macroContainer);
     }
 }
 
 
-bool runCommand(const string& str, vector< pair<string, string> >& defines, vector<string>& redefinedMacros)
+bool runCommand(const string& str, MacroContainer& macroContainer)
 {
     if(str.empty())
         {}
     else if(str == "clean"){
-        defines.clear();
-        redefinedMacros.clear();
+        macroContainer.defines.clear();
+        macroContainer.redefinedMacros.clear();
+        macroContainer.incorrectMacros.clear();
     }
     else if(str == "help")
         printHelp();
     else if(str == "stat"){
-        cout << defines.size() << " macros were loaded." << endl;
-        cout << "whose " << redefinedMacros.size() << " macros have been redefined." << endl;
+        cout << macroContainer.defines.size() << " macros were loaded." << endl;
+        cout << "|-> " << macroContainer.redefinedMacros.size() << " macros have been redefined." << endl;
+        cout << "|-> " << macroContainer.incorrectMacros.size() << " macros seem incorrect." << endl;
     }
     else if(str == "list"){
-        for(const auto& p: defines){
-            if(std::find(redefinedMacros.begin(), redefinedMacros.end(), p.first) == redefinedMacros.end())
+        cout << "The command 'list' does not exist." << endl;
+        cout << "Did you mean listok ? listre ? listin ?" << endl;
+    }
+    else if(str == "listok"){
+        for(const auto& p: macroContainer.defines){
+            if(std::find(macroContainer.redefinedMacros.begin(), macroContainer.redefinedMacros.end(), p.first) == macroContainer.redefinedMacros.end())
                 cout << p.first << " => " << p.second << endl;
         }
     }
     else if(str == "listre"){
-        for(const string& str: redefinedMacros){
+        for(const string& str: macroContainer.redefinedMacros){
+            cout << " - " << str << endl;
+        }
+    }
+    else if(str == "listin"){
+        for(const string& str: macroContainer.incorrectMacros){
             cout << " - " << str << endl;
         }
     }
     else if(str.substr(0, 11) == "importfile "){
-        readFile(str.substr(11), defines, redefinedMacros);
-        runCommand("stat", defines, redefinedMacros);
+        readFile(str.substr(11), macroContainer);
+        runCommand("stat", macroContainer);
     }
 
     else if(str.substr(0, 13) == "importfolder "){
-        readDirectory(str.substr(13), defines, redefinedMacros);
-        runCommand("stat", defines, redefinedMacros);
+        readDirectory(str.substr(13), macroContainer);
+        runCommand("stat", macroContainer);
     }
 
     else if(str.substr(0, 5) == "look ")
     {
-        if(defines.empty())
+        if(macroContainer.defines.empty())
             cout << "No macros were imported yet." << endl;
         else
         {
@@ -77,16 +87,22 @@ bool runCommand(const string& str, vector< pair<string, string> >& defines, vect
 
             bool found = false;
 
-            for(pair<string,string> p : defines)
+            for(pair<string,string>& p : macroContainer.defines)
             {
                 if(p.first == userInput)
                 {
                     cout << "first definition: " << p.second << endl;
                     string output = p.second;
-                    bool okay = calculateExpression(output, defines, redefinedMacros);
+                    bool displayPbInfo = false;
+                    bool okay = calculateExpression(output, macroContainer.defines, macroContainer.redefinedMacros, macroContainer.incorrectMacros, displayPbInfo);
                     cout << "output: " << output << endl;
                     if(!okay)
                         cout << "/!\\ The expression can't be calculated. /!\\\n";
+                    if(displayPbInfo){
+                        cout << "\nIt seems that you are using macros that seem incorrect or have been redefined." << endl;
+                        cout << "You can look for the values available for that specific macro by typing 'search [macro]'." << endl;
+                        cout << "And finally you address the issue by correcting its value by typing 'define [macro] [value]." << endl;
+                    }
                     found=true;
                     break;
                 }
@@ -106,17 +122,20 @@ bool runCommand(const string& str, vector< pair<string, string> >& defines, vect
             str2=str.substr(6+ss.tellg());
 
         bool found = false;
-        for(auto& p: defines){
+        for(auto& p: macroContainer.defines){
             if(p.first == str1){
                 p.second = str2;
                 found = true;
             }
         }
         if(!found)
-            defines.emplace_back(str1, str2);
+            macroContainer.defines.emplace_back(str1, str2);
+        std::remove(macroContainer.incorrectMacros.begin(), macroContainer.incorrectMacros.end(), str1);
+        if(!doesExprLookOk(str2))
+            cout << "/!\\ Warning: the expression of the macro doesn't look correct. /!\\" << endl;
     }
     else if(str.substr(0,7) == "search " && str.size()>8){
-        for(const auto& p: defines){
+        for(const auto& p: macroContainer.defines){
             if(p.first.find(str.substr(7)) != string::npos)
                 cout << " - " << p.first << " => " << p.second << endl;
         }

@@ -34,7 +34,7 @@ BOOL DirectoryExists(LPCTSTR szPath)
 
 #ifdef LOWLEVEL_FILE_IMPORT
 
-bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defineList, stringvec& redefinedMacros)
+bool readFile(const string& pathToFile, MacroContainer& macroContainer)
 {
     ifstream file(pathToFile);
 
@@ -124,21 +124,55 @@ bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defi
                 clearSpaces(str1);
                 clearSpaces(str2);
 
-                for(pair<string,string>& p: defineList)
+
+                for(pair<string,string>& p: macroContainer.defines)
                 {
                     if(p.first == str1 && p.second != str2){
-                        redefinedMacros.emplace_back(str1);
+                        macroContainer.redefinedMacros.emplace_back(str1);
                         continue;
                     }
                 }
+
 
                 // Do not import macros containing errors
                 if(str2.find("#define") == string::npos
                 && !((str1.find('(') != string::npos && str1.find(')') == string::npos)
                 || (str1.find('(') == string::npos && str1.find(')') != string::npos)))
                 {
+                    // If it is a multiple line macro
+                    while(str2.back() == '/')
+                    {
+                        string inpLine;
+
+                        // we get the next line
+                        getline(file, inpLine);
+                        clearSpaces(inpLine);
+                        str2 += inpLine;
+
+                        auto look = str2.find("//");
+                        if(look == string::npos){
+                            look = str2.find("/*");
+                            if(look != string::npos){
+                                char k='a';
+                                while(file.get(characterRead)){
+                                    if(k=='*' && characterRead=='/')
+                                        break;
+                                    k=characterRead;
+                                }
+                            }
+                        }
+                        if(look != string::npos){
+                            str2 = str2.substr(0,look);
+                        }
+                    }
+
+
                     // Add the couple to the define list
-                    defineList.emplace_back( str1, str2 );
+                    macroContainer.defines.emplace_back( str1, str2 );
+
+                    if(!doesExprLookOk(str2)){
+                        macroContainer.incorrectMacros.emplace_back(str1);
+                    }
                 }
 
 
@@ -160,7 +194,7 @@ bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defi
 #else
 
 
-bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defineList, stringvec& redefinedMacros)
+bool readFile(const string& pathToFile, MacroContainer& mc)
 {
     ifstream file(pathToFile);
 
@@ -205,10 +239,10 @@ bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defi
             clearSpaces(str1);
             clearSpaces(str2);
 
-            for(pair<string,string>& p: defineList)
+            for(pair<string,string>& p: mc.defines)
             {
                 if(p.first == str1 && p.second != str2){
-                    redefinedMacros.emplace_back(str1);
+                    mc.redefinedMacros.emplace_back(str1);
                     continue;
                 }
             }
@@ -216,7 +250,7 @@ bool readFile(const string& pathToFile, std::vector< pair<string,string> >& defi
 
 
             // Add the couple to the define list
-            defineList.emplace_back( str1, str2 );
+            mc.defines.emplace_back( str1, str2 );
 
         }
 
@@ -326,7 +360,7 @@ static void printNbFilesLoaded(std::mutex& mymutex, bool& ended, unsigned& nbFil
 
 #endif
 
-bool readDirectory(string dir, vector< pair<string, string> >& defineList, stringvec& redefinedMacros)
+bool readDirectory(string dir, MacroContainer& macroContainer)
 {
     stringvec fileCollection;
 
@@ -343,13 +377,16 @@ bool readDirectory(string dir, vector< pair<string, string> >& defineList, strin
     std::mutex mymutex;
     std::thread tr = std::thread(printNbFilesLoaded, std::ref(mymutex), std::ref(ended), std::ref(nbFiles), fileCollection.size());
     #endif
+    #ifdef DISPLAY_FOLDER_IMPORT_TIME
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    #endif // DISPLAY_FOLDER_IMPORT_TIME
 
-    for(string str: fileCollection)
+    for(const string& str: fileCollection)
     {
         if(hasEnding(str, ".h") || hasEnding(str, ".c") || hasEnding(str, ".cpp") || hasEnding(str, ".hpp"))
         {
-            if(!readFile(str, defineList, redefinedMacros)){
-                std::cout << "Couldn't read/open file : " << str << endl;
+            if(!readFile(str, macroContainer)){
+                std::cerr << "Couldn't read/open file : " << str << endl;
             }
 
 
@@ -376,6 +413,9 @@ bool readDirectory(string dir, vector< pair<string, string> >& defineList, strin
     mymutex.unlock();
     tr.join();
     #endif
+    #ifdef DISPLAY_FOLDER_IMPORT_TIME
+    cout << "Import time: " << (now-std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) << " ms.\n";
+    #endif // DISPLAY_FOLDER_IMPORT_TIME
 
 
     return true;

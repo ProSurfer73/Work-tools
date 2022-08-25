@@ -5,6 +5,8 @@
 
 #define ENABLE_FILE_LOADING_BAR
 #define LOWLEVEL_FILE_IMPORT
+#define DISPLAY_FOLDER_IMPORT_TIME
+#define DISPLAY_USER_INFO
 
 // Config parameters for the string evaluation
 

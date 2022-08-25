@@ -10,7 +10,7 @@ void printHelp()
     cout << "- look [macro] : calculate the value of a macro given in input" << endl;
     cout << "- define [macro] [value] : add/replace a specific macro" << endl;
     cout << "- search [name] : print all macros containing the string name" << endl;
-    cout << "- listok/listre/listin : print the list of okay/redefined/incorrect macros" << endl;
+    cout << "- listall/listok/listre/listin : print the list of all/okay/redefined/incorrect macros" << endl;
     cout << "- clean : delete all macros registered" << endl;
     cout << "- exit : quit the program" << endl;
 }
@@ -51,7 +51,7 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
         cout << "The command 'list' does not exist." << endl;
         cout << "Did you mean listok ? listre ? listin ?" << endl;
     }
-    else if(str == "listok"){
+    else if(str == "listall"){
         for(const auto& p: macroContainer.defines){
             if(std::find(macroContainer.redefinedMacros.begin(), macroContainer.redefinedMacros.end(), p.first) == macroContainer.redefinedMacros.end())
                 cout << p.first << " => " << p.second << endl;
@@ -59,12 +59,26 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
     }
     else if(str == "listre"){
         for(const string& str: macroContainer.redefinedMacros){
-            cout << " - " << str << endl;
+            cout << " - " << str;
+            for(const pair<string,string>& p: macroContainer.defines){
+                if(p.first == str){
+                    cout << " => " << p.second;
+                    break;
+                }
+            }
+            cout << endl;
         }
     }
     else if(str == "listin"){
         for(const string& str: macroContainer.incorrectMacros){
-            cout << " - " << str << endl;
+            cout << " - " << str;
+            for(const pair<string,string>& p: macroContainer.defines){
+                if(p.first == str){
+                    cout << " => " << p.second;
+                    break;
+                }
+            }
+            cout << endl;
         }
     }
     else if(str.substr(0, 11) == "importfile "){
@@ -131,6 +145,7 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
         if(!found)
             macroContainer.defines.emplace_back(str1, str2);
         std::remove(macroContainer.incorrectMacros.begin(), macroContainer.incorrectMacros.end(), str1);
+        std::remove(macroContainer.redefinedMacros.begin(), macroContainer.redefinedMacros.end(), str1);
         if(!doesExprLookOk(str2))
             cout << "/!\\ Warning: the expression of the macro doesn't look correct. /!\\" << endl;
     }

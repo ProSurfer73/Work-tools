@@ -130,7 +130,7 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
         size_t maxSizeReplaceSig = 0;
 
         // Look for the longest word to replace
-        for(pair<string,string> p: dictionary)
+        for(const pair<string,string>& p: dictionary)
         {
             const string& mac = p.first;
 

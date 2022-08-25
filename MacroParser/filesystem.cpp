@@ -125,7 +125,7 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                 clearSpaces(str2);
 
 
-                for(pair<string,string>& p: macroContainer.defines)
+                for(const pair<string,string>& p: macroContainer.defines)
                 {
                     if(p.first == str1 && p.second != str2){
                         macroContainer.redefinedMacros.emplace_back(str1);
@@ -139,9 +139,12 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                 && !((str1.find('(') != string::npos && str1.find(')') == string::npos)
                 || (str1.find('(') == string::npos && str1.find(')') != string::npos)))
                 {
+                    cout << str2[str2.size()-1] << endl;
+
                     // If it is a multiple line macro
-                    while(str2.back() == '/')
+                    while(str2.back() == '\\')
                     {
+                        str2.pop_back();
                         string inpLine;
 
                         // we get the next line
@@ -299,6 +302,7 @@ void explore_directory(std::string directory_name, stringvec& fileCollection)
 static void printNbFilesLoaded(std::mutex& mymutex, bool& ended, unsigned& nbFiles, const unsigned maxNbFiles)
 {
     // First initial delay before starting to diplay loading status
+    const auto start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
     int delayFirstSleep = 4000;
 
@@ -333,13 +337,14 @@ static void printNbFilesLoaded(std::mutex& mymutex, bool& ended, unsigned& nbFil
                 unsigned currentNbFiles = nbFiles;
             #endif
 
-            #if defined DEBUG_LOG_FILE_IMPORT && defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
+            #if defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
             mymutex.lock();
             #endif // DEBUG_LOG_FILE_IMPORT
 
-            cout << '[' << currentNbFiles*100/static_cast<float>(maxNbFiles) << "%] " << currentNbFiles << " files over " << maxNbFiles << " are loaded.\n";
+            cout << '[' << currentNbFiles*100/static_cast<float>(maxNbFiles) << "%] " << currentNbFiles << " files over " << maxNbFiles << " are loaded. ~"
+            << maxNbFiles*(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()-start)/currentNbFiles/60000 << "min left\n" ;
 
-            #if defined DEBUG_LOG_FILE_IMPORT && defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
+            #if defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
             mymutex.unlock();
             #endif // DEBUG_LOG_FILE_IMPORT
 
@@ -414,7 +419,8 @@ bool readDirectory(string dir, MacroContainer& macroContainer)
     tr.join();
     #endif
     #ifdef DISPLAY_FOLDER_IMPORT_TIME
-    cout << "Import time: " << (now-std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) << " ms.\n";
+    auto importTime = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()-now);
+    cout << "Import time: " << importTime << " ms.\n";
     #endif // DISPLAY_FOLDER_IMPORT_TIME
 
 

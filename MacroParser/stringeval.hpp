@@ -10,8 +10,11 @@
 
 #include "config.hpp"
 #include "hexa.hpp"
+#include "command.hpp"
 
 using namespace std;
+
+struct MacroContainer;
 
 void clearSpaces(string& str);
 
@@ -19,7 +22,7 @@ bool doesExprLookOk(const string& expr);
 
 double evaluateArithmeticExpr(const std::string& expr);
 
-bool calculateExpression(string& expr, const vector< pair<string,string> >& dictionary, const vector<string>& redefinedMacros, const vector<string>& incorrectMacros, bool& shouldDisplayPbInfo);
+bool calculateExpression(string& expr, const MacroContainer& macroContainer, bool& shouldDisplayPbInfo);
 
 
 #endif // STRINGEVAL_HPP

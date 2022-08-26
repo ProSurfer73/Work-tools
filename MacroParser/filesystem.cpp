@@ -124,23 +124,29 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                 clearSpaces(str1);
                 clearSpaces(str2);
 
+                // Ignore simple letter macro
+                if(str2.empty() || str1.size()==1)
+                    continue;
+
+
+
+
 
                 for(const pair<string,string>& p: macroContainer.defines)
                 {
-                    if(p.first == str1 && p.second != str2){
-                        macroContainer.redefinedMacros.emplace_back(str1);
+                    if(p.first == str1)
+                    {
+                        if(p.second != str2)
+                            macroContainer.redefinedMacros.emplace_back(str1);
+                        while(file.get(characterRead) && characterRead != '\n');
                         continue;
                     }
                 }
 
 
                 // Do not import macros containing errors
-                if(str2.find("#define") == string::npos
-                && !((str1.find('(') != string::npos && str1.find(')') == string::npos)
-                || (str1.find('(') == string::npos && str1.find(')') != string::npos)))
+                if(str2.find("#define") == string::npos)
                 {
-                    cout << str2[str2.size()-1] << endl;
-
                     // If it is a multiple line macro
                     while(str2.back() == '\\')
                     {
@@ -171,11 +177,14 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
 
 
                     // Add the couple to the define list
-                    macroContainer.defines.emplace_back( str1, str2 );
+                    // If the couple does not already exist
+                    //if(std::find(macroContainer.defines.begin(), macroContainer.defines.end(), std::make_pair(str1, str2)) == macroContainer.defines.end())
+                        macroContainer.defines.emplace_back( str1, str2 );
 
                     if(!doesExprLookOk(str2)){
                         macroContainer.incorrectMacros.emplace_back(str1);
                     }
+
                 }
 
 
@@ -342,7 +351,7 @@ static void printNbFilesLoaded(std::mutex& mymutex, bool& ended, unsigned& nbFil
             #endif // DEBUG_LOG_FILE_IMPORT
 
             cout << '[' << currentNbFiles*100/static_cast<float>(maxNbFiles) << "%] " << currentNbFiles << " files over " << maxNbFiles << " are loaded. ~"
-            << maxNbFiles*(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()-start)/currentNbFiles/60000 << "min left\n" ;
+            << maxNbFiles*(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()-start)/(currentNbFiles+1)/60000 << "min left\n" ;
 
             #if defined DEBUG_LOG_FILE_IMPORT && defined ENABLE_MUTEX_LOADINGBAR
             mymutex.unlock();

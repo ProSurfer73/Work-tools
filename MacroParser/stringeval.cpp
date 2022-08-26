@@ -93,13 +93,18 @@ double evaluateArithmeticExpr(const string& expr)
 /** \brief
  *
  * \param expr: macro given in input
- * \param dictionary: the list of all macros and their deinfition
+ * \param macroContainer
  * \return true is the expression has been calculated, or false
  *
  */
 
-bool calculateExpression(string& expr, const vector< pair<string,string> >& dictionary, const vector<string>& redefinedMacros, const vector<string>& incorrectMacros, bool& shouldDisplayPbInfo)
+bool calculateExpression(string& expr, const MacroContainer& macroContainer, bool& shouldDisplayPbInfo)
 {
+    const auto& dictionary = macroContainer.defines;
+    const auto& redefinedMacros = macroContainer.redefinedMacros;
+    const auto& incorrectMacros = macroContainer.incorrectMacros;
+
+
     /// 0. Is the expression okay ?
 
     if(expr[0] == '?')
@@ -130,7 +135,7 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
         size_t maxSizeReplaceSig = 0;
 
         // Look for the longest word to replace
-        for(const pair<string,string>& p: dictionary)
+        for(const pair<string,string>& p: macroContainer.defines)
         {
             const string& mac = p.first;
 
@@ -160,9 +165,9 @@ bool calculateExpression(string& expr, const vector< pair<string,string> >& dict
         {
 
         // Replace it
-        for(pair<string,string> p: dictionary)
+        for(pair<string,string> p: macroContainer.defines)
         {
-            if(p.first.size() == maxSizeReplace && expr.find(p.first) != string::npos
+            if(p.first.size() == maxSizeReplace && expr.find(p.first) != string::npos && doesExprLookOk(p.second)
             )//&& (expr.find(p.first)==0 || !isMacroCharacter(expr[expr.find(p.first)-1])) )
             {
                 #ifdef DEBUG_LOG_STRINGEVAL

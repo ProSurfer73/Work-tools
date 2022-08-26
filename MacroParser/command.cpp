@@ -101,14 +101,14 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
 
             bool found = false;
 
-            for(pair<string,string>& p : macroContainer.defines)
+            for(auto& p : macroContainer.defines)
             {
                 if(p.first == userInput)
                 {
                     cout << "first definition: " << p.second << endl;
                     string output = p.second;
                     bool displayPbInfo = false;
-                    bool okay = calculateExpression(output, macroContainer.defines, macroContainer.redefinedMacros, macroContainer.incorrectMacros, displayPbInfo);
+                    bool okay = calculateExpression(output, macroContainer, displayPbInfo);
                     cout << "output: " << output << endl;
                     if(!okay)
                         cout << "/!\\ The expression can't be calculated. /!\\\n";
@@ -152,7 +152,7 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
     else if(str.substr(0,7) == "search " && str.size()>8){
         for(const auto& p: macroContainer.defines){
             if(p.first.find(str.substr(7)) != string::npos)
-                cout << " - " << p.first << " => " << p.second << endl;
+                cout << " - " << p.first << " => " << p.second << '\'' << endl;
         }
     }
     else if(str == "exit")

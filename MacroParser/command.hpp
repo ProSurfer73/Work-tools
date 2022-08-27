@@ -30,8 +30,6 @@ struct MacroContainer
 };
 
 
-void printHelp();
-
 bool runCommand(const string& str, MacroContainer& macroContainer);
 
 void dealWithUser(MacroContainer& macroContainer);

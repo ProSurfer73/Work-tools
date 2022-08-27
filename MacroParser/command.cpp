@@ -1,6 +1,6 @@
 #include "command.hpp"
 
-void printHelp()
+static void printHelp()
 {
     cout << "Here are the available commands:" << endl;
     cout << "- help : print this menu" << endl;

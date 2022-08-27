@@ -124,24 +124,9 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                 clearSpaces(str1);
                 clearSpaces(str2);
 
-                // Ignore simple letter macro
+                // Ignore single letter macro and empty ones
                 if(str2.empty() || str1.size()==1)
                     continue;
-
-
-
-
-
-                for(const pair<string,string>& p: macroContainer.defines)
-                {
-                    if(p.first == str1)
-                    {
-                        if(p.second != str2)
-                            macroContainer.redefinedMacros.emplace_back(str1);
-                        while(file.get(characterRead) && characterRead != '\n');
-                        continue;
-                    }
-                }
 
 
                 // Do not import macros containing errors
@@ -176,10 +161,22 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                     }
 
 
+                    for(const pair<string,string>& p: macroContainer.defines)
+                    {
+                        if(p.first == str1)
+                        {
+                            if(p.second != str2)
+                                macroContainer.redefinedMacros.emplace_back(str1);
+                            while(file.get(characterRead) && characterRead != '\n');
+                            continue;
+                        }
+                    }
+
+
                     // Add the couple to the define list
                     // If the couple does not already exist
                     //if(std::find(macroContainer.defines.begin(), macroContainer.defines.end(), std::make_pair(str1, str2)) == macroContainer.defines.end())
-                        macroContainer.defines.emplace_back( str1, str2 );
+                    macroContainer.defines.emplace_back( str1, str2 );
 
                     if(!doesExprLookOk(str2)){
                         macroContainer.incorrectMacros.emplace_back(str1);

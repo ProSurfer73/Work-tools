@@ -53,7 +53,6 @@ unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywor
  * \return
  *
  */
-
 unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSearched, const char* keywordReplaced, std::ostream& output, bool addNumberAtTheEnd)
 {
     unsigned nbOccurences=0;
@@ -163,7 +162,7 @@ int main()
     }
 
 
-    std::ofstream resultFile("C:\\Users\\divouxje\\Desktop\\output.txt");
+    //std::ofstream resultFile("C:\\Users\\divouxje\\Desktop\\output.txt");
 
     reask:
 
@@ -176,7 +175,7 @@ int main()
     // search mode
     if(input == "1")
     {
-         nb = searchKeywords(fileCollection, keywords, resultFile);
+         nb = searchKeywords(fileCollection, keywords, cout);
     }
 
     // replace mode
@@ -190,7 +189,7 @@ int main()
         getline(cin, input);
 
 
-         nb = replaceKeyword(fileCollection, keywords.front(), str2.c_str(), resultFile, (input[0]=='y'));
+         nb = replaceKeyword(fileCollection, keywords.front(), str2.c_str(), cout, (input[0]=='y'));
     }
 
     // Incorrect input
@@ -204,6 +203,11 @@ int main()
 
 
     std::cout << nb << " results found." << std::endl;
+
+    std::cout << "\nThanks for trusting Search&Replace program." << endl;
+    std::cout << "Press enter to exit" << endl;
+
+    getline(cin, input);
 
 
     return 0;

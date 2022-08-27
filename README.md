@@ -1,6 +1,7 @@
 # Work-tools
 The tools I created and used during my apprenticeship at STMicroelectronics.
 They may interest you if you are developping in C/C++, and if you are facing one of the situations these tools are trying to resolve.
+They are only working on Windows for now, but ports can be easily made.
 
 Here is the list of the tools :
 

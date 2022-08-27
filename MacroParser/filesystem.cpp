@@ -54,7 +54,7 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
 
     while(file.get(characterRead))
     {
-        /// avoid to laod defines that are commented
+        /// avoid to load defines that are commented
         if(characterRead == '/')
         {
             posLineComment++;
@@ -76,7 +76,7 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
             posDefineStr++;
 
             //
-            if(posDefineStr == 7)
+            if(posDefineStr >= 8)
             {
                 posDefineStr = 0;
 
@@ -85,24 +85,22 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                 /// We get the identifier
 
                 // We skip spaces first
-                while(file.get(characterRead) && characterRead != '\n'){
-                    if(characterRead != ' '){
+                while(file.get(characterRead)){
+                    if(characterRead == '\n')
+                        continue;
+                    else if(characterRead != ' '){
                         str1 += characterRead;
                         break;
                     }
                 }
-                // Then we laod the identifier (the complete word)
-                while(file.get(characterRead) && characterRead != '\n' && characterRead != ' '){
+                // Then we load the identifier (the complete word)
+                while(file.get(characterRead) && characterRead != ' '){
+                        if(characterRead == '\n')
+                            continue;
                         str1 += characterRead;
                 }
 
-
-                // skip spaces
-                //while(file >> characterRead && characterRead == ' ')
-
                 string str2;
-
-                //int posComment=0;
 
                 // We get the value
                 while(file.get(characterRead) && characterRead != '\n')
@@ -129,36 +127,34 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                     continue;
 
 
-                // Do not import macros containing errors
-                if(str2.find("#define") == string::npos)
+                // If it is a multiple line macro
+                while(str2.back() == '\\')
                 {
-                    // If it is a multiple line macro
-                    while(str2.back() == '\\')
-                    {
-                        str2.pop_back();
-                        string inpLine;
+                    str2.pop_back();
 
-                        // we get the next line
-                        getline(file, inpLine);
-                        clearSpaces(inpLine);
-                        str2 += inpLine;
+                    string inpLine;
 
-                        auto look = str2.find("//");
-                        if(look == string::npos){
-                            look = str2.find("/*");
-                            if(look != string::npos){
-                                char k='a';
-                                while(file.get(characterRead)){
-                                    if(k=='*' && characterRead=='/')
-                                        break;
-                                    k=characterRead;
-                                }
+                    // we get the next line
+                    getline(file, inpLine);
+                    clearSpaces(inpLine);
+                    str2 += inpLine;
+
+                    auto look = str2.find("//");
+                    if(look == string::npos){
+                        look = str2.find("/*");
+                        if(look != string::npos){
+                            char k='a';
+                            while(file.get(characterRead)){
+                                if(k=='*' && characterRead=='/')
+                                    break;
+                                k=characterRead;
                             }
                         }
-                        if(look != string::npos){
-                            str2 = str2.substr(0,look);
-                        }
                     }
+                    else {
+                        str2 = str2.substr(0,look);
+                    }
+                }
 
 
                     for(const pair<string,string>& p: macroContainer.defines)
@@ -167,27 +163,16 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                         {
                             if(p.second != str2)
                                 macroContainer.redefinedMacros.emplace_back(str1);
-                            while(file.get(characterRead) && characterRead != '\n');
                             continue;
                         }
                     }
 
-
                     // Add the couple to the define list
-                    // If the couple does not already exist
-                    //if(std::find(macroContainer.defines.begin(), macroContainer.defines.end(), std::make_pair(str1, str2)) == macroContainer.defines.end())
                     macroContainer.defines.emplace_back( str1, str2 );
 
                     if(!doesExprLookOk(str2)){
                         macroContainer.incorrectMacros.emplace_back(str1);
                     }
-
-                }
-
-
-
-
-
             }
 
         }
@@ -219,7 +204,7 @@ bool readFile(const string& pathToFile, MacroContainer& mc)
     while(getline(file, inputLine))
     {
         // If the line starts with the prefix "#define"
-        if (inputLine.size()>10 && inputLine[0]=='#' && inputLine.substr(0,8) == "#define ")
+        if (inputLine.size()>10 && inputLine.front()=='#' && inputLine.substr(0,8) == "#define ")
         {
             // Delete the define part from the line
             inputLine = inputLine.substr(7);
@@ -230,8 +215,7 @@ bool readFile(const string& pathToFile, MacroContainer& mc)
             ss >> str1;
 
             inputLine += "   ";
-            //string str2 = inputLine.substr(inputLine.find_last_of(str1)+2);
-            //string str2 = inputLine.substr(inputLine.find_last_of(str1)+1);
+
             string str2 = std::string(&inputLine[ss.tellg()]);
 
             // Deal with comment that could appear on str2
@@ -256,20 +240,14 @@ bool readFile(const string& pathToFile, MacroContainer& mc)
                 }
             }
 
-
-
             // Add the couple to the define list
             mc.defines.emplace_back( str1, str2 );
-
         }
-
-
     }
 
     #ifdef DEBUG_LOG_FILE_IMPORT
-                cout << endl;
+        cout << endl;
     #endif
-
 
     return true;
 }
@@ -286,8 +264,8 @@ void explore_directory(std::string directory_name, stringvec& fileCollection)
 
 
     // We explore all teh different inputs
-    for(size_t i=0; i < sv.size(); ++i){
-
+    for(size_t i=0; i < sv.size(); ++i)
+    {
         // IF there is a point then, it's a file
         // Also it's important to note that filenames "." and ".." aren't files
         // oldimplemntation: if(sv[i].find('.') != std::string::npos && sv[i]!="." && sv[i]!="..")
@@ -432,13 +410,4 @@ bool readDirectory(string dir, MacroContainer& macroContainer)
 
     return true;
 }
-
-
-
-
-
-
-
-
-
 

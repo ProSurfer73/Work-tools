@@ -46,7 +46,7 @@ bool doesExprLookOk(const string& expr)
     for(unsigned i=0; i<expr.size(); ++i){
         if(expr[i]=='(')
             remainingParenthesis++;
-        if(expr[i]==')'){
+        else if(expr[i]==')'){
             remainingParenthesis--;
             if(remainingParenthesis<0)
                 return false;
@@ -60,9 +60,12 @@ bool doesExprLookOk(const string& expr)
     for(unsigned i=1; i<expr.size(); ++i){
         if(isOperationCharacter(expr[i]) && isOperationCharacter(expr[i-1]))
             return false;
+
+        // It contains # => Incorrect
+        // Our program doesn't deal with ## yet.
+        if(expr[i] == '#')
+            return false;
     }
-
-
 
     return true;
 }
@@ -167,8 +170,7 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
         // Replace it
         for(pair<string,string> p: macroContainer.defines)
         {
-            if(p.first.size() == maxSizeReplace && expr.find(p.first) != string::npos && doesExprLookOk(p.second)
-            )//&& (expr.find(p.first)==0 || !isMacroCharacter(expr[expr.find(p.first)-1])) )
+            if(p.first.size() == maxSizeReplace && expr.find(p.first) != string::npos && doesExprLookOk(p.second))
             {
                 #ifdef DEBUG_LOG_STRINGEVAL
                 std::cout << "replace:" << p.first << endl << p.second << endl;

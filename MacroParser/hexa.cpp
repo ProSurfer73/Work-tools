@@ -90,37 +90,6 @@ bool isHexaLetter(char c)
     return ( (c>='0' && c<='9') || (c>='a' && c<='f') || (c>='A' && c<='F') );
 }
 
-
-/*
-std::string convertDeciToHexa(long int num_decimal)
-{
-    long int remainder, quotient ;
-    int a = 1 , b , var ;
-    char hexanum_decimal[ 100 ] ;
-
-    quotient = num_decimal ;
-
-    while( quotient != 0 )
-    {
-        var = quotient % 16 ;
-        if( var < 10 )
-            var = var + 48 ;
-        else
-            var = var + 55 ;
-        hexanum_decimal[ a++ ]= var ;
-        quotient = quotient / 16;
-    }
-
-    hexanum_decimal[a] = '\0';
-
-    #ifdef DEBUG_LOG_STRINGEVAL
-    cout << "deci: " << num_decimal << endl;
-    cout << "tohexa: " << hexanum_decimal << endl;
-    #endif // DEBUG_LOG_STRINGEVAL
-
-    return hexanum_decimal;
-}*/
-
 string convertDeciToHexa(long int num) {
    char arr[100];
    int i = 0;

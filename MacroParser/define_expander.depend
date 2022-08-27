@@ -61,7 +61,7 @@
 1661533807 source:c:\git\work-tools\macroparser\command.cpp
 	"command.hpp"
 
-1661534379 c:\git\work-tools\macroparser\command.hpp
+1661604964 c:\git\work-tools\macroparser\command.hpp
 	<iostream>
 	<vector>
 	<sstream>
@@ -100,7 +100,7 @@
 	"hexa.hpp"
 	"command.hpp"
 
-1661417522 c:\git\work-tools\macroparser\config.hpp
+1661603921 c:\git\work-tools\macroparser\config.hpp
 
 1660467863 c:\git\work-tools\macroparser\hexa.hpp
 	<stdio.h>
@@ -110,20 +110,89 @@
 	<string>
 	"config.hpp"
 
-1661534539 source:c:\git\work-tools\macroparser\filesystem.cpp
+1661605110 source:c:\git\work-tools\macroparser\filesystem.cpp
 	"filesystem.hpp"
 
-1660482265 source:c:\git\work-tools\macroparser\hexa.cpp
+1661600196 source:c:\git\work-tools\macroparser\hexa.cpp
 	"hexa.hpp"
 
-1661376010 source:c:\git\work-tools\macroparser\main.cpp
+1661603763 source:c:\git\work-tools\macroparser\main.cpp
 	<iostream>
 	<fstream>
 	"hexa.hpp"
 	"stringeval.hpp"
 	"command.hpp"
 
-1661516375 source:c:\git\work-tools\macroparser\stringeval.cpp
+1661600300 source:c:\git\work-tools\macroparser\stringeval.cpp
 	"stringeval.hpp"
 	<iostream>
+
+1661533807 source:c:\users\divouxje\desktop\t\work-tools\macroparser\command.cpp
+	"command.hpp"
+
+1661604964 c:\users\divouxje\desktop\t\work-tools\macroparser\command.hpp
+	<iostream>
+	<vector>
+	<sstream>
+	<map>
+	"filesystem.hpp"
+	"stringeval.hpp"
+
+1661375567 c:\users\divouxje\desktop\t\work-tools\macroparser\filesystem.hpp
+	<string>
+	<vector>
+	<fstream>
+	<sstream>
+	<windows.h>
+	<iostream>
+	<thread>
+	<mutex>
+	<iomanip>
+	<vector>
+	<fstream>
+	<sstream>
+	<windows.h>
+	<iostream>
+	<thread>
+	<mutex>
+	"stringeval.hpp"
+	"config.hpp"
+	"command.hpp"
+
+1661516211 c:\users\divouxje\desktop\t\work-tools\macroparser\stringeval.hpp
+	<vector>
+	<string>
+	<sstream>
+	<regex>
+	<cassert>
+	"config.hpp"
+	"hexa.hpp"
+	"command.hpp"
+
+1661611188 c:\users\divouxje\desktop\t\work-tools\macroparser\config.hpp
+
+1660467863 c:\users\divouxje\desktop\t\work-tools\macroparser\hexa.hpp
+	<stdio.h>
+	<math.h>
+	<string.h>
+	<iostream>
+	<string>
+	"config.hpp"
+
+1661611519 source:c:\users\divouxje\desktop\t\work-tools\macroparser\filesystem.cpp
+	"filesystem.hpp"
+
+1661600196 source:c:\users\divouxje\desktop\t\work-tools\macroparser\hexa.cpp
+	"hexa.hpp"
+
+1661600300 source:c:\users\divouxje\desktop\t\work-tools\macroparser\stringeval.cpp
+	"stringeval.hpp"
+	<iostream>
+
+1661611154 source:c:\users\divouxje\desktop\t\work-tools\macroparser\main.cpp
+	<iostream>
+	<fstream>
+	"hexa.hpp"
+	"stringeval.hpp"
+	"command.hpp"
 

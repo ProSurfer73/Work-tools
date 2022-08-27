@@ -57,6 +57,15 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
                 cout << p.first << " => " << p.second << endl;
         }
     }
+
+    // List only the macros that are at the same time not incorrect and not redefined
+    else if(str == "listok"){
+        for(const auto& p: macroContainer.defines){
+            if(std::find(macroContainer.incorrectMacros.begin(), macroContainer.incorrectMacros.end(), p.first) == macroContainer.incorrectMacros.end()
+            && std::find(macroContainer.redefinedMacros.begin(), macroContainer.redefinedMacros.end(), p.first) == macroContainer.redefinedMacros.end())
+                std::cout << p.first << " => " << p.second << endl;
+        }
+    }
     else if(str == "listre"){
         for(const string& str: macroContainer.redefinedMacros){
             cout << " - " << str;

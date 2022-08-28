@@ -58,7 +58,7 @@
 	"filesystem.hpp"
 	"stringeval.hpp"
 
-1661533807 source:c:\git\work-tools\macroparser\command.cpp
+1661706108 source:c:\git\work-tools\macroparser\command.cpp
 	"command.hpp"
 
 1661604964 c:\git\work-tools\macroparser\command.hpp
@@ -100,7 +100,7 @@
 	"hexa.hpp"
 	"command.hpp"
 
-1661603921 c:\git\work-tools\macroparser\config.hpp
+1661707306 c:\git\work-tools\macroparser\config.hpp
 
 1660467863 c:\git\work-tools\macroparser\hexa.hpp
 	<stdio.h>
@@ -110,20 +110,20 @@
 	<string>
 	"config.hpp"
 
-1661605110 source:c:\git\work-tools\macroparser\filesystem.cpp
+1661707103 source:c:\git\work-tools\macroparser\filesystem.cpp
 	"filesystem.hpp"
 
 1661600196 source:c:\git\work-tools\macroparser\hexa.cpp
 	"hexa.hpp"
 
-1661603763 source:c:\git\work-tools\macroparser\main.cpp
+1661611154 source:c:\git\work-tools\macroparser\main.cpp
 	<iostream>
 	<fstream>
 	"hexa.hpp"
 	"stringeval.hpp"
 	"command.hpp"
 
-1661600300 source:c:\git\work-tools\macroparser\stringeval.cpp
+1661612113 source:c:\git\work-tools\macroparser\stringeval.cpp
 	"stringeval.hpp"
 	<iostream>
 
@@ -195,4 +195,11 @@
 	"hexa.hpp"
 	"stringeval.hpp"
 	"command.hpp"
+
+1661702148 source:c:\git\work-tools\macroparser\options.cpp
+	"options.hpp"
+
+1661702130 c:\git\work-tools\macroparser\options.hpp
+	<fstream>
+	<string>
 

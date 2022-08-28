@@ -91,8 +91,10 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
         }
     }
     else if(str.substr(0, 11) == "importfile "){
-        readFile(str.substr(11), macroContainer);
-        runCommand("stat", macroContainer);
+        if(!readFile(str.substr(11), macroContainer))
+            cout << "/!\\ Error: can't open the given file. /!\\" << endl;
+        else
+            runCommand("stat", macroContainer);
     }
 
     else if(str.substr(0, 13) == "importfolder "){
@@ -118,9 +120,10 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
                     string output = p.second;
                     bool displayPbInfo = false;
                     bool okay = calculateExpression(output, macroContainer, displayPbInfo);
-                    cout << "output: " << output << endl;
-                    if(!okay)
+                    if(!okay || displayPbInfo)
                         cout << "/!\\ The expression can't be calculated. /!\\\n";
+                    else
+                        cout << "output: " << output << endl;
                     if(displayPbInfo){
                         cout << "\nIt seems that you are using macros that seem incorrect or have been redefined." << endl;
                         cout << "You can look for the values available for that specific macro by typing 'search [macro]'." << endl;
@@ -134,7 +137,6 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
             if(!found)
                 cout << "No macro was found with this name." << endl;
         }
-
     }
     else if(str.substr(0,7) == "define " && str.size()>=10){
         std::stringstream ss(str.substr(6));
@@ -163,6 +165,10 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
             if(p.first.find(str.substr(7)) != string::npos)
                 cout << " - " << p.first << " => " << p.second << '\'' << endl;
         }
+    }
+    else if(str.substr(0,6) == "choose "){
+
+
     }
     else if(str == "exit")
         return false;

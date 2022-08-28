@@ -32,13 +32,11 @@ BOOL DirectoryExists(LPCTSTR szPath)
          (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-#ifdef LOWLEVEL_FILE_IMPORT
-
 bool readFile(const string& pathToFile, MacroContainer& macroContainer)
 {
     ifstream file(pathToFile);
 
-    if(file.fail())
+    if(!file.is_open())
         return false;
 
     #ifdef DEBUG_LOG_FILE_IMPORT
@@ -69,6 +67,25 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
             }
         }
 
+        #ifdef IGNORE_MACRO_INSIDE_LONG_COMMENT
+
+        else if(characterRead == '*' && posLineComment==1)
+        {
+            // We skip everything until we reach the end of comment "*/"
+            char previousRead='r';
+
+            while(file.get(characterRead))
+            {
+                if(previousRead=='*' && characterRead=='/') {
+                    break;
+                }
+                previousRead=characterRead;
+            }
+
+            posLineComment=0;
+        }
+
+        #endif
 
 
         else if(characterRead == defineStr[posDefineStr])
@@ -176,83 +193,16 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
             }
 
         }
-        else
+        else {
             posDefineStr = 0;
-    }
-
-
-
-    return true;
-}
-
-#else
-
-
-bool readFile(const string& pathToFile, MacroContainer& mc)
-{
-    ifstream file(pathToFile);
-
-    if(!file.is_open())
-        return false;
-
-    #ifdef DEBUG_LOG_FILE_IMPORT
-        cout << "Opened " << pathToFile << endl;
-    #endif
-
-    string inputLine;
-
-    while(getline(file, inputLine))
-    {
-        // If the line starts with the prefix "#define"
-        if (inputLine.size()>10 && inputLine.front()=='#' && inputLine.substr(0,8) == "#define ")
-        {
-            // Delete the define part from the line
-            inputLine = inputLine.substr(7);
-
-            std::stringstream ss(inputLine);
-
-            string str1;
-            ss >> str1;
-
-            inputLine += "   ";
-
-            string str2 = std::string(&inputLine[ss.tellg()]);
-
-            // Deal with comment that could appear on str2
-            auto look = str2.find("//");
-            if(look == string::npos) look = str2.find("/*");
-            if(look != string::npos){
-                str2 = str2.substr(0,look);
-            }
-
-            #ifdef DEBUG_LOG_FILE_IMPORT
-                cout << str1 << " => " << str2 << endl;
-            #endif
-
-            clearSpaces(str1);
-            clearSpaces(str2);
-
-            for(pair<string,string>& p: mc.defines)
-            {
-                if(p.first == str1 && p.second != str2){
-                    mc.redefinedMacros.emplace_back(str1);
-                    continue;
-                }
-            }
-
-            // Add the couple to the define list
-            mc.defines.emplace_back( str1, str2 );
         }
     }
 
-    #ifdef DEBUG_LOG_FILE_IMPORT
-        cout << endl;
-    #endif
+
 
     return true;
 }
 
-#endif
 
 
 void explore_directory(std::string directory_name, stringvec& fileCollection)

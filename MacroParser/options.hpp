@@ -24,7 +24,6 @@ private:
 
     bool importOnlySourceFileExtension;
     bool importMacroCommented; // should macro that are inside comment such as // and /* be imported ?
-
 };
 
 

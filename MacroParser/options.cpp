@@ -22,7 +22,7 @@ bool Options::loadFromFile(const char* filename)
             {
                 if(line.substr(30)=="true")
                     importMacroCommented=true;
-                else if(line.substr(30)=="false")
+                //else if(line.substr(30)=="false")
 
             }
 

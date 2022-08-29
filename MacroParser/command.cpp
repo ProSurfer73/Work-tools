@@ -44,6 +44,17 @@ static void extractList(std::vector<std::string>& outputList, const std::string&
     }
 }
 
+static void removeFromVector(std::vector<std::string>& v, const std::string& str)
+{
+    for(auto it=v.begin(); it!=v.end();)
+    {
+        if(*it == str)
+            it = v.erase(it);
+        else
+            ++it;
+    }
+}
+
 
 
 bool runCommand(string str, MacroContainer& macroContainer, Options& configuration)
@@ -172,20 +183,18 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
         string str2;
         if(ss.tellg() != (-1))
             str2=str.substr(6+ss.tellg());
-
-        bool found = false;
-        for(auto& p: macroContainer.defines){
-            if(p.first == str1){
-                p.second = str2;
-                found = true;
-            }
-        }
-        if(!found)
-            macroContainer.defines.emplace_back(str1, str2);
-        std::remove(macroContainer.incorrectMacros.begin(), macroContainer.incorrectMacros.end(), str1);
-        std::remove(macroContainer.redefinedMacros.begin(), macroContainer.redefinedMacros.end(), str1);
         if(!doesExprLookOk(str2))
             cout << "/!\\ Warning: the expression of the macro doesn't look correct. /!\\" << endl;
+
+        for(auto it=macroContainer.defines.begin(); it!=macroContainer.defines.end();){
+            if(it->first == str1)
+                it=macroContainer.defines.erase(it);
+            else
+                ++it;
+        }
+        removeFromVector(macroContainer.incorrectMacros, str1);
+        removeFromVector(macroContainer.redefinedMacros, str1);
+        macroContainer.defines.emplace_back(str1, str2);
     }
     else if(str.substr(0,7) == "search " && str.size()>8){
         std::vector<std::string> wordsToFind;

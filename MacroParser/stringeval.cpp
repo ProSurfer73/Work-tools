@@ -190,6 +190,8 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
                 if(std::find(redefinedMacros.begin(), redefinedMacros.end(), p.first) != redefinedMacros.end()){
                     cout << "/!\\ Warning: the macro " << p.first << " you are using have been redefined /!\\" << endl;
                     shouldDisplayPbInfo = true;
+
+                    //
                 }
 
                 if(std::find(incorrectMacros.begin(), incorrectMacros.end(), p.first) != incorrectMacros.end()){

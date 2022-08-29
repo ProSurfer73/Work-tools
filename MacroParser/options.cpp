@@ -94,10 +94,10 @@ bool Options::changeOption(const std::string& s1, const std::string& s2)
     bool valueToBeSet=false;
 
     // Interpret s2
-    if(s1=="1"||s1=="true"){
+    if(s2=="1"||s2=="true"){
         valueToBeSet=true;
     }
-    else if(s1=="2"||s2=="false"){
+    else if(s2=="2"||s2=="false"){
         valueToBeSet=false;
     }
     else {

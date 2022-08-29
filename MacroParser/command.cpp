@@ -45,6 +45,7 @@ static void extractList(std::vector<std::string>& outputList, const std::string&
 }
 
 
+
 bool runCommand(string str, MacroContainer& macroContainer, Options& configuration)
 {
     // lower characters related to the name of the command
@@ -70,9 +71,13 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
         cout << "Did you mean listok ? listre ? listin ?" << endl;
     }
     else if(str == "listall"){
+        unsigned nbPrinted=0;
         for(const auto& p: macroContainer.defines){
-            if(std::find(macroContainer.redefinedMacros.begin(), macroContainer.redefinedMacros.end(), p.first) == macroContainer.redefinedMacros.end())
-                cout << p.first << " => " << p.second << endl;
+            cout << p.first << " => " << p.second << endl;
+            if(++nbPrinted >= 1000){
+                cout << "/!\\ Only printed the 1000 first results /!\\" << endl;
+                break;
+            }
         }
     }
 
@@ -111,13 +116,16 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
     else if(str.substr(0, 11) == "importfile "){
         if(!readFile(str.substr(11), macroContainer))
             cout << "/!\\ Error: can't open the given file. /!\\" << endl;
-        else
+        else {
             runCommand("stat", macroContainer, configuration);
+            return true;
+        }
     }
 
     else if(str.substr(0, 13) == "importfolder "){
         readDirectory(str.substr(13), macroContainer, configuration.doesImportOnlySourceFileExtension());
         runCommand("stat", macroContainer, configuration);
+        return true;
     }
 
     else if(str.substr(0, 5) == "look ")
@@ -212,6 +220,7 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
     }
     else if(str == "cls"){
         system("cls");
+        return true;
     }
     else if(str == "exit")
         return false;

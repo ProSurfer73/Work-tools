@@ -173,23 +173,31 @@ bool readFile(const string& pathToFile, MacroContainer& macroContainer)
                     }
                 }
 
+                bool isTheSame = false;
 
-                    for(const pair<string,string>& p: macroContainer.defines)
+
+                for(const pair<string,string>& p: macroContainer.defines)
+                {
+                    if(p.first == str1)
                     {
-                        if(p.first == str1)
-                        {
-                            if(p.second != str2)
-                                macroContainer.redefinedMacros.emplace_back(str1);
-                            continue;
-                        }
+                        if(p.second != str2)
+                            macroContainer.redefinedMacros.emplace_back(str1);
+                        else
+                            isTheSame=true;
+                        break;
                     }
+                }
 
+                if(!isTheSame)
+                {
                     // Add the couple to the define list
                     macroContainer.defines.emplace_back( str1, str2 );
 
                     if(!doesExprLookOk(str2)){
                         macroContainer.incorrectMacros.emplace_back(str1);
                     }
+                }
+
             }
 
         }

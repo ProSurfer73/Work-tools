@@ -1,4 +1,4 @@
 importOnlySourceFileExtension=1
 importMacroCommented=1
-printReplacements=0
-printExprAtEveryStep=1
+printReplacements=1
+printExprAtEveryStep=0

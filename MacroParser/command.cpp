@@ -9,7 +9,7 @@ static void printHelp()
     cout << "- stat : print the number of macros imported" << endl;
     cout << "- look [macro] : calculate the value of a macro given in input" << endl;
     cout << "- define [macro] [value] : add/replace a specific macro" << endl;
-    cout << "- search [name] : print all macros containing the string name" << endl;
+    cout << "- search [name] [...] : print all macros containing the string(s) given in their name" << endl;
     cout << "- listall/listok/listre/listin : print the list of all/okay/redefined/incorrect macros" << endl;
     cout << "- options : display the options used for file import and string evaluation" << endl;
     cout << "- changeoption [name] [value] : change an option name" << endl;
@@ -32,6 +32,18 @@ void dealWithUser(MacroContainer& macroContainer, Options& configuration)
         running = runCommand(userInput, macroContainer, configuration);
     }
 }
+
+static void extractList(std::vector<std::string>& outputList, const std::string& initialString)
+{
+    istringstream iss(initialString);
+    string str;
+
+    while(iss >> str)
+    {
+        outputList.emplace_back(str);
+    }
+}
+
 
 bool runCommand(string str, MacroContainer& macroContainer, Options& configuration)
 {
@@ -168,8 +180,17 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
             cout << "/!\\ Warning: the expression of the macro doesn't look correct. /!\\" << endl;
     }
     else if(str.substr(0,7) == "search " && str.size()>8){
-        for(const auto& p: macroContainer.defines){
-            if(p.first.find(str.substr(7)) != string::npos)
+        std::vector<std::string> wordsToFind;
+        extractList(wordsToFind, str.substr(7));
+
+        for(const auto& p: macroContainer.defines)
+        {
+            bool okay=true;
+            for(const auto& s: wordsToFind){
+                if(p.first.find(s) == std::string::npos)
+                    okay=false;
+            }
+            if(okay)
                 cout << " - " << p.first << " => " << p.second << '\'' << endl;
         }
     }
@@ -202,4 +223,6 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
 
     return true;
 }
+
+
 

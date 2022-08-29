@@ -29,8 +29,10 @@ void locateAndReplaceHexa(std::string& str, const Options& options)
 
         if(options.doesPrintExprAtEveryStep())
         {
-            cout << "expr: " << str << endl;
+            cout << str << endl;
         }
+
+
 
 
         search = str.find('x');

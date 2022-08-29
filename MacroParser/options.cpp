@@ -54,7 +54,7 @@ bool Options::loadFromFile(const char* filename)
     return false;
 }
 
- bool Options::loadBooleanValue(const std::string& input, bool& booleanValue)
+bool Options::loadBooleanValue(const std::string& input, bool& booleanValue)
 {
     if(input=="1" || input=="true"){
         booleanValue = true;
@@ -86,6 +86,45 @@ bool Options::saveToFile(const char* filename) const
         return false;
 
     toStream(file);
+    return true;
+}
+
+bool Options::changeOption(const std::string& s1, const std::string& s2)
+{
+    bool valueToBeSet=false;
+
+    // Interpret s2
+    if(s1=="1"||s1=="true"){
+        valueToBeSet=true;
+    }
+    else if(s1=="2"||s2=="false"){
+        valueToBeSet=false;
+    }
+    else {
+        std::cout << "Error setting the option : The value must be 1 or 0." << std::endl;
+        return false;
+    }
+
+
+    if(s1=="importOnlySourceFileExtension"){
+        importOnlySourceFileExtension=valueToBeSet;
+    }
+    else if(s1=="importMacroCommented"){
+        importMacroCommented=valueToBeSet;
+    }
+    else if(s1=="printReplacements"){
+        printReplacements=valueToBeSet;
+    }
+    else if(s1=="printExprAtEveryStep"){
+        printExprAtEveryStep=valueToBeSet;
+    }
+    else {
+        std::cout << "Error setting the option: the option does not exists." << std::endl;
+        return false;
+    }
+
+    saveToFile(OPTIONS_FILENAME);
+
     return true;
 }
 

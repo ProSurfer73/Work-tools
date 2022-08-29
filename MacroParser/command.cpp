@@ -12,6 +12,7 @@ static void printHelp()
     cout << "- search [name] : print all macros containing the string name" << endl;
     cout << "- listall/listok/listre/listin : print the list of all/okay/redefined/incorrect macros" << endl;
     cout << "- options : display the options used for file import and string evaluation" << endl;
+    cout << "- changeoption [name] [value] : change an option name" << endl;
     cout << "- clean : delete all macros registered" << endl;
     cout << "- cls : clear console" << endl;
     cout << "- exit : quit the program" << endl;
@@ -23,7 +24,7 @@ void dealWithUser(MacroContainer& macroContainer, Options& configuration)
 
     while(running)
     {
-        cout << "\n > ";
+        cout << " > ";
 
         string userInput;
         getline(cin, userInput);
@@ -145,7 +146,7 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
         }
     }
     else if(str.substr(0,7) == "define " && str.size()>=10){
-        std::stringstream ss(str.substr(6));
+        std::istringstream ss(str.substr(6));
         string str1;
         ss >> str1;
         string str2;
@@ -175,9 +176,18 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
     else if(str == "options"){
         // Print the configuration
         configuration.toStream(cout);
-        cout << "You can modify options inside a file '" << OPTIONS_FILENAME << "' you have to create in same repertory as the '.exe' file." << endl;
-        cout << "Copy and paste the above. Restart of the program is needed. Be careful not to screw it up, no check will be made." << endl;
-
+        cout << "The options are saved in the file '" << OPTIONS_FILENAME << "' next to the executable." << endl;
+    }
+    else if(str.substr(0,12) == "changeoption"){
+        istringstream ss(str.substr(12));
+        string s1,s2;
+        ss >> s1 >> s2;
+        if(s1.empty()||s2.empty()){
+            cout << "Error: Empty option parameter." << endl;
+        }
+        else {
+            configuration.changeOption(s1,s2);
+        }
     }
     else if(str == "cls"){
         system("cls");
@@ -187,6 +197,8 @@ bool runCommand(string str, MacroContainer& macroContainer, Options& configurati
     else {
         cout << "This command is unknown." << endl;
     }
+
+    cout << endl;
 
     return true;
 }

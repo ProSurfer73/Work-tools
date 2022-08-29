@@ -197,6 +197,9 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
                     shouldDisplayPbInfo = true;
                 }
 
+                if(config.doesPrintExprAtEveryStep())
+                    cout << expr << endl;
+
 
                 break;
             }
@@ -339,8 +342,7 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
 
                 expr = afterDeletion;
 
-                if(config.doesPrintExprAtEveryStep())
-                    cout << "expr: " << expr << endl;
+
 
             }
             else
@@ -360,9 +362,6 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
                 #endif
 
                 expr = afterDeletion;
-
-                if(config.doesPrintExprAtEveryStep())
-                    cout << "expr: " << expr << endl;
             }
 
             #ifdef DEBUG_ENABLE_ASSERTIONS
@@ -372,6 +371,9 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
 
 
             clearSpaces(expr);
+
+            if(config.doesPrintExprAtEveryStep())
+                cout << expr << endl;
         }
 
         if(!doesExprLookOk(expr))

@@ -15,7 +15,7 @@ int main()
 {
     // Welcoming message
     std::cout << "WELCOME TO MACRO PARSER." << endl;
-    std::cout << "Type 'help' to see the available commands." << endl;
+    std::cout << "Type 'help' to see the available commands.\n" << endl;
 
     // Macro database (stored in volatile memory)
     MacroContainer macroContainer;

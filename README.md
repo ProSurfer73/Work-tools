@@ -5,18 +5,8 @@ They are only working on Windows for now, but ports can be easily made.
 
 Here is the list of the tools :
 
-1. MACRO PARSER (initially called 'define expander')
-![MAcroParser1](https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/MacroParser1.png)
-This is my most prominent project.
-This project import all macros from a file or from a folder and has an option integrated to it to look for the value of the related macro.
-It has a nice interface and a help menu.
-![MAcroParser2](https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/MacroParser2.png)
-It reads hexadecimal values, deal with parenthesis, and warns the user when this one uses a macro that has multiple definition.
 
-
-
-
-2. DUPLICATE FILENAME FINDER (initially called 'folder compare')
+1. DUPLICATE FILENAME FINDER (initially called 'folder compare')
 ![Duplicate1](https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/DuplicateFilenameSearcher.PNG)
 Have you ever wondered how you could look for file with the same name, different content, and that are in 2 seperate folders at the same time ?
 I have the solution for you in my project : folder compare.
@@ -25,10 +15,7 @@ Then, you enter the subsidiarie folders.
 The file has to be at the same time in the reference folder and in at least one of the subsidiairie folder in order to be printed.
 Once you have the results, you can type the filename of the file to see where you can find that specific file.
 
-
-
-
-3. USELESS SEARCHER (initially called 'library searcher')
+2. USELESS SEARCHER (initially called 'library searcher')
 ![UselessSearcher1](https://raw.githubusercontent.com/ProSurfer73/Work-tools/main/Screenshots/UselessSearcher.PNG)
 I meant to create a program that looks for useless files before pushing them.
 The program looks at all the files (including their extension), the content of the project files, 

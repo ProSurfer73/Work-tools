@@ -2,9 +2,17 @@
 
 Options::Options()
 {
+    resetToDefault();
+    loadFromFile(OPTIONS_FILENAME);
+}
+
+void Options::resetToDefault()
+{
     // Set default parameters for the option
     importOnlySourceFileExtension = true;
-    importMacroCommented = true;
+    importMacroCommented = false;
+    printReplacements = false;
+    printExprAtEveryStep = false;
 }
 
 
@@ -20,13 +28,20 @@ bool Options::loadFromFile(const char* filename)
         {
             if(line.substr(0,30)=="importOnlySourceFileExtension=")
             {
-                if(line.substr(30)=="true")
-                    importMacroCommented=true;
-                //else if(line.substr(30)=="false")
-
+                loadBooleanValue(line.substr(30), importOnlySourceFileExtension);
             }
-
-
+            else if(line.substr(0,21)=="importMacroCommented=")
+            {
+                loadBooleanValue(line.substr(21), importMacroCommented);
+            }
+            else if(line.substr(0,18)=="printReplacements=")
+            {
+                loadBooleanValue(line.substr(18), printReplacements);
+            }
+            else if(line.substr(0,21)=="printExprAtEveryStep=")
+            {
+                loadBooleanValue(line.substr(21), printExprAtEveryStep);
+            }
         }
 
 
@@ -39,14 +54,59 @@ bool Options::loadFromFile(const char* filename)
     return false;
 }
 
-void loadBooleanValue(std::istream& input, bool& booleanValue)
+ bool Options::loadBooleanValue(const std::string& input, bool& booleanValue)
 {
+    if(input=="1" || input=="true"){
+        booleanValue = true;
+        return true;
+    }
+    else if(input == "0" || input=="false"){
+        booleanValue = false;
+        return true;
+    }
 
+    return false;
+}
+
+void Options::toStream(std::ostream& stream) const
+{
+    stream << "importOnlySourceFileExtension=" << importOnlySourceFileExtension << std::endl;
+    stream << "importMacroCommented=" << importMacroCommented << std::endl;
+    stream << "printReplacements=" << printReplacements << std::endl;
+    stream << "printExprAtEveryStep=" << printExprAtEveryStep << std::endl;
 }
 
 
 
-bool Options::saveToFile(const char* filename)
+bool Options::saveToFile(const char* filename) const
 {
+    std::ofstream file(filename);
 
+    if(!file)
+        return false;
+
+    toStream(file);
+    return true;
+}
+
+// Getters implementation
+
+bool Options::doesImportOnlySourceFileExtension() const
+{
+    return importOnlySourceFileExtension;
+}
+
+bool Options::doesImportMacroCommented() const
+{
+    return importMacroCommented;
+}
+
+bool Options::doesPrintReplacements() const
+{
+    return printReplacements;
+}
+
+bool Options::doesPrintExprAtEveryStep() const
+{
+    return printExprAtEveryStep;
 }

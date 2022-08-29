@@ -36,6 +36,6 @@ BOOL DirectoryExists(LPCTSTR szPath);
 
 bool readFile(const string& pathToFile, MacroContainer& macroContainer);
 
-bool readDirectory(string dir, MacroContainer& macroContainer);
+bool readDirectory(string dir, MacroContainer& macroContainer, const bool loadOnlySourceFile);
 
 #endif // FILESYSTEM_HPP

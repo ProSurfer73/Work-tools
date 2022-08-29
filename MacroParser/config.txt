@@ -1,0 +1,3 @@
+importOnlySourceFileExtension=1
+importMacroCommented=1
+printReplacements=1

@@ -8,8 +8,9 @@
 #include <string>
 
 #include "config.hpp"
+#include "options.hpp"
 
-void locateAndReplaceHexa(std::string& str);
+void locateAndReplaceHexa(std::string& str, const Options& options);
 
 long long convertHexaToDeci(const std::string& hex);
 

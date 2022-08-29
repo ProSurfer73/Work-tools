@@ -11,11 +11,13 @@ static void printHelp()
     cout << "- define [macro] [value] : add/replace a specific macro" << endl;
     cout << "- search [name] : print all macros containing the string name" << endl;
     cout << "- listall/listok/listre/listin : print the list of all/okay/redefined/incorrect macros" << endl;
+    cout << "- options : display the options used for file import and string evaluation" << endl;
     cout << "- clean : delete all macros registered" << endl;
+    cout << "- cls : clear console" << endl;
     cout << "- exit : quit the program" << endl;
 }
 
-void dealWithUser(MacroContainer& macroContainer)
+void dealWithUser(MacroContainer& macroContainer, Options& configuration)
 {
     bool running=true;
 
@@ -26,13 +28,16 @@ void dealWithUser(MacroContainer& macroContainer)
         string userInput;
         getline(cin, userInput);
 
-        running = runCommand(userInput, macroContainer);
+        running = runCommand(userInput, macroContainer, configuration);
     }
 }
 
-
-bool runCommand(const string& str, MacroContainer& macroContainer)
+bool runCommand(string str, MacroContainer& macroContainer, Options& configuration)
 {
+    // lower characters related to the name of the command
+    for(unsigned i=0; i<str.size() && str[i]!=' '; ++i)
+        str[i] = tolower(str[i]);
+
     if(str.empty())
         {}
     else if(str == "clean"){
@@ -94,12 +99,12 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
         if(!readFile(str.substr(11), macroContainer))
             cout << "/!\\ Error: can't open the given file. /!\\" << endl;
         else
-            runCommand("stat", macroContainer);
+            runCommand("stat", macroContainer, configuration);
     }
 
     else if(str.substr(0, 13) == "importfolder "){
-        readDirectory(str.substr(13), macroContainer);
-        runCommand("stat", macroContainer);
+        readDirectory(str.substr(13), macroContainer, configuration.doesImportOnlySourceFileExtension());
+        runCommand("stat", macroContainer, configuration);
     }
 
     else if(str.substr(0, 5) == "look ")
@@ -119,16 +124,17 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
                     cout << "first definition: " << p.second << endl;
                     string output = p.second;
                     bool displayPbInfo = false;
-                    bool okay = calculateExpression(output, macroContainer, displayPbInfo);
-                    if(!okay || displayPbInfo)
+                    bool okay = calculateExpression(output, macroContainer, displayPbInfo, configuration);
+                    if(!okay)
                         cout << "/!\\ The expression can't be calculated. /!\\\n";
+                    if(displayPbInfo){
+                        cout << "possible output: " << output << "???" << endl;
+                        cout << "\nIt seems that you are using macros that seem incorrect or have been redefined. The output can't be trsuted." << endl;
+                        cout << "You can look for the values available for that specific macro by typing 'search [macro]'." << endl;
+                        cout << "And finally you address the issue by correcting its value by typing 'define [macro] [value]'." << endl;
+                    }
                     else
                         cout << "output: " << output << endl;
-                    if(displayPbInfo){
-                        cout << "\nIt seems that you are using macros that seem incorrect or have been redefined." << endl;
-                        cout << "You can look for the values available for that specific macro by typing 'search [macro]'." << endl;
-                        cout << "And finally you address the issue by correcting its value by typing 'define [macro] [value]." << endl;
-                    }
                     found=true;
                     break;
                 }
@@ -166,9 +172,15 @@ bool runCommand(const string& str, MacroContainer& macroContainer)
                 cout << " - " << p.first << " => " << p.second << '\'' << endl;
         }
     }
-    else if(str.substr(0,6) == "choose "){
+    else if(str == "options"){
+        // Print the configuration
+        configuration.toStream(cout);
+        cout << "You can modify options inside a file '" << OPTIONS_FILENAME << "' you have to create in same repertory as the '.exe' file." << endl;
+        cout << "Copy and paste the above. Restart of the program is needed. Be careful not to screw it up, no check will be made." << endl;
 
-
+    }
+    else if(str == "cls"){
+        system("cls");
     }
     else if(str == "exit")
         return false;

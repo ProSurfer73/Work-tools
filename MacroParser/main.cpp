@@ -4,6 +4,7 @@
 #include "hexa.hpp"
 #include "stringeval.hpp"
 #include "command.hpp"
+#include "options.hpp"
 
 using namespace std;
 
@@ -19,8 +20,11 @@ int main()
     // Macro database (stored in volatile memory)
     MacroContainer macroContainer;
 
+    // Options of the program
+    Options configuration;
+
     // Let's start the command prompt
-    dealWithUser(macroContainer);
+    dealWithUser(macroContainer, configuration);
 
     return 0;
 }

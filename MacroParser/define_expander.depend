@@ -58,18 +58,19 @@
 	"filesystem.hpp"
 	"stringeval.hpp"
 
-1661706108 source:c:\git\work-tools\macroparser\command.cpp
+1661778449 source:c:\git\work-tools\macroparser\command.cpp
 	"command.hpp"
 
-1661604964 c:\git\work-tools\macroparser\command.hpp
+1661778497 c:\git\work-tools\macroparser\command.hpp
 	<iostream>
 	<vector>
 	<sstream>
 	<map>
 	"filesystem.hpp"
 	"stringeval.hpp"
+	"options.hpp"
 
-1661375567 c:\git\work-tools\macroparser\filesystem.hpp
+1661777368 c:\git\work-tools\macroparser\filesystem.hpp
 	<string>
 	<vector>
 	<fstream>
@@ -90,7 +91,7 @@
 	"config.hpp"
 	"command.hpp"
 
-1661516211 c:\git\work-tools\macroparser\stringeval.hpp
+1661773453 c:\git\work-tools\macroparser\stringeval.hpp
 	<vector>
 	<string>
 	<sstream>
@@ -99,31 +100,34 @@
 	"config.hpp"
 	"hexa.hpp"
 	"command.hpp"
+	"options.hpp"
 
-1661707306 c:\git\work-tools\macroparser\config.hpp
+1661773647 c:\git\work-tools\macroparser\config.hpp
 
-1660467863 c:\git\work-tools\macroparser\hexa.hpp
+1661779496 c:\git\work-tools\macroparser\hexa.hpp
 	<stdio.h>
 	<math.h>
 	<string.h>
 	<iostream>
 	<string>
 	"config.hpp"
+	"options.hpp"
 
-1661707103 source:c:\git\work-tools\macroparser\filesystem.cpp
+1661777368 source:c:\git\work-tools\macroparser\filesystem.cpp
 	"filesystem.hpp"
 
-1661600196 source:c:\git\work-tools\macroparser\hexa.cpp
+1661779516 source:c:\git\work-tools\macroparser\hexa.cpp
 	"hexa.hpp"
 
-1661611154 source:c:\git\work-tools\macroparser\main.cpp
+1661775629 source:c:\git\work-tools\macroparser\main.cpp
 	<iostream>
 	<fstream>
 	"hexa.hpp"
 	"stringeval.hpp"
 	"command.hpp"
+	"options.hpp"
 
-1661612113 source:c:\git\work-tools\macroparser\stringeval.cpp
+1661779277 source:c:\git\work-tools\macroparser\stringeval.cpp
 	"stringeval.hpp"
 	<iostream>
 
@@ -196,10 +200,11 @@
 	"stringeval.hpp"
 	"command.hpp"
 
-1661702148 source:c:\git\work-tools\macroparser\options.cpp
+1661779107 source:c:\git\work-tools\macroparser\options.cpp
 	"options.hpp"
 
-1661702130 c:\git\work-tools\macroparser\options.hpp
+1661779107 c:\git\work-tools\macroparser\options.hpp
 	<fstream>
 	<string>
+	"config.hpp"
 

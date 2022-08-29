@@ -7,6 +7,7 @@
 #define DISPLAY_FOLDER_IMPORT_TIME
 #define DISPLAY_USER_INFO
 #define IGNORE_MACRO_INSIDE_LONG_COMMENT
+#define OPTIONS_FILENAME "config.txt"
 
 // Config parameters for the string evaluation
 

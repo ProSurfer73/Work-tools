@@ -40,6 +40,8 @@
 		<Unit filename="hexa.cpp" />
 		<Unit filename="hexa.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="options.cpp" />
+		<Unit filename="options.hpp" />
 		<Unit filename="stringeval.cpp" />
 		<Unit filename="stringeval.hpp" />
 		<Extensions>

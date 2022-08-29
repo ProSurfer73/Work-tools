@@ -10,20 +10,32 @@
 
 #include <fstream>
 #include <string>
+#include "config.hpp"
 
 class Options
 {
 public:
     Options();
+    void toStream(std::ostream& stream) const;
 
-    bool loadFromFile(const char* filename);
-    bool saveToFile(const char* filename);
+    // Getters
+    bool doesImportOnlySourceFileExtension() const;
+    bool doesImportMacroCommented() const;
+    bool doesPrintReplacements() const;
+    bool doesPrintExprAtEveryStep() const;
 
 private:
-    void loadBooleanValue(std::istream& input);
+    bool saveToFile(const char* filename) const;
+    bool loadFromFile(const char* filename);
+    static bool loadBooleanValue(const std::string& input, bool& boolean);
+    void resetToDefault();
 
     bool importOnlySourceFileExtension;
     bool importMacroCommented; // should macro that are inside comment such as // and /* be imported ?
+    bool printReplacements; //
+    bool printExprAtEveryStep;
+
+friend void askUserAboutConfig(Options& options);
 };
 
 

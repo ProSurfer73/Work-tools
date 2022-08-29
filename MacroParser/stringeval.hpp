@@ -11,6 +11,7 @@
 #include "config.hpp"
 #include "hexa.hpp"
 #include "command.hpp"
+#include "options.hpp"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ bool doesExprLookOk(const string& expr);
 
 double evaluateArithmeticExpr(const std::string& expr);
 
-bool calculateExpression(string& expr, const MacroContainer& macroContainer, bool& shouldDisplayPbInfo);
+bool calculateExpression(string& expr, const MacroContainer& macroContainer, bool& shouldDisplayPbInfo, const Options& config);
 
 
 #endif // STRINGEVAL_HPP

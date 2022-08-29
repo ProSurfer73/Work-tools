@@ -101,7 +101,7 @@ double evaluateArithmeticExpr(const string& expr)
  *
  */
 
-bool calculateExpression(string& expr, const MacroContainer& macroContainer, bool& shouldDisplayPbInfo)
+bool calculateExpression(string& expr, const MacroContainer& macroContainer, bool& shouldDisplayPbInfo, const Options& config)
 {
     const auto& dictionary = macroContainer.defines;
     const auto& redefinedMacros = macroContainer.redefinedMacros;
@@ -123,7 +123,7 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
 
     #ifdef READ_HEXADECIMAL
         // Look and replace hexa
-        locateAndReplaceHexa(expr);
+        locateAndReplaceHexa(expr, config);
     #endif
 
 
@@ -172,9 +172,10 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
         {
             if(p.first.size() == maxSizeReplace && expr.find(p.first) != string::npos && doesExprLookOk(p.second))
             {
-                #ifdef DEBUG_LOG_STRINGEVAL
-                std::cout << "replace:" << p.first << endl << p.second << endl;
-                #endif // DEBUG_LOG_STRINGEVAL
+                if(config.doesPrintReplacements()){
+                    std::cout << "replaced '" << p.first << "' by '" << p.second << "'" << endl;
+                }
+
 
                 // If replacement strings aren't correct
                 if((p.first.find('(') != string::npos && p.first.find(')') == string::npos)
@@ -203,7 +204,7 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
 
         #ifdef READ_HEXADECIMAL
             // Look and replace hexa
-            locateAndReplaceHexa(expr);
+            locateAndReplaceHexa(expr, config);
         #endif
 
         }
@@ -234,6 +235,10 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
                         //cop2 = std::regex_replace(cop2, std::regex("(x)"), cop1); // replace 'def' -> 'klm'
                         cop1 = std::regex_replace(cop2, std::regex("(x)"), cop1); // replace 'def' -> 'klm'
 
+                        if(config.doesPrintReplacements()){
+                            cout << "replaced '" << p.first << "' by '" << p.second << '\'' << endl;
+                        }
+
                         #ifdef DEBUG_LOG_STRINGEVAL
                         cout << "before: " << expr << "==" << mac << endl;
                         #endif
@@ -254,6 +259,10 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
             #ifdef DEBUG_LOG_STRINGEVAL
                 cout << "S&R:" << expr << endl;
             #endif
+            if(config.doesPrintExprAtEveryStep()){
+                cout << "expr:" << expr << endl;
+            }
+
             repeat = true;
         }
 
@@ -330,9 +339,9 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
 
                 expr = afterDeletion;
 
-                #ifdef DEBUG_LOG_STRINGEVAL
-                cout << expr << endl;
-                #endif
+                if(config.doesPrintExprAtEveryStep())
+                    cout << "expr: " << expr << endl;
+
             }
             else
             {
@@ -351,6 +360,9 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
                 #endif
 
                 expr = afterDeletion;
+
+                if(config.doesPrintExprAtEveryStep())
+                    cout << "expr: " << expr << endl;
             }
 
             #ifdef DEBUG_ENABLE_ASSERTIONS

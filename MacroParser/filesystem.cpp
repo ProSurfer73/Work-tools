@@ -299,7 +299,7 @@ static void printNbFilesLoaded(std::mutex& mymutex, bool& ended, unsigned& nbFil
 
 #endif
 
-bool readDirectory(string dir, MacroContainer& macroContainer)
+bool readDirectory(string dir, MacroContainer& macroContainer, const bool loadOnlySourceFile)
 {
     stringvec fileCollection;
 
@@ -322,7 +322,7 @@ bool readDirectory(string dir, MacroContainer& macroContainer)
 
     for(const string& str: fileCollection)
     {
-        if(hasEnding(str, ".h") || hasEnding(str, ".c") || hasEnding(str, ".cpp") || hasEnding(str, ".hpp"))
+        if(!loadOnlySourceFile || hasEnding(str, ".h") || hasEnding(str, ".c") || hasEnding(str, ".cpp") || hasEnding(str, ".hpp"))
         {
             if(!readFile(str, macroContainer)){
                 std::cerr << "Couldn't read/open file : " << str << endl;

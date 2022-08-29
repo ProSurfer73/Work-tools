@@ -5,7 +5,7 @@ using namespace std;
 
 
 // This function looks for hexadecimal numbers and try to replace them by decimal number
-void locateAndReplaceHexa(std::string& str)
+void locateAndReplaceHexa(std::string& str, const Options& options)
 {
     auto search = str.find('x');
 
@@ -27,6 +27,10 @@ void locateAndReplaceHexa(std::string& str)
 
         str = begStr + to_string(convertHexaToDeci(midStr)) + endStr;
 
+        if(options.doesPrintExprAtEveryStep())
+        {
+            cout << "expr: " << str << endl;
+        }
 
 
         search = str.find('x');
@@ -67,7 +71,7 @@ long long convertHexaToDeci(const std::string& hex)
             val = hex[i] - 65 + 10;
         }
         else if(hex[i] != 'x') {
-            std::cout << "/!\\\n";
+            std::cerr << "/!\\\n";
             break;
         }
 
@@ -90,7 +94,8 @@ bool isHexaLetter(char c)
     return ( (c>='0' && c<='9') || (c>='a' && c<='f') || (c>='A' && c<='F') );
 }
 
-string convertDeciToHexa(long int num) {
+string convertDeciToHexa(long int num)
+{
    char arr[100];
    int i = 0;
    while(num!=0) {

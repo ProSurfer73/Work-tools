@@ -8,6 +8,7 @@
 
 #include "filesystem.hpp"
 #include "stringeval.hpp"
+#include "options.hpp"
 
 using namespace std;
 
@@ -29,8 +30,8 @@ struct MacroContainer
 };
 
 
-bool runCommand(const string& str, MacroContainer& macroContainer);
+bool runCommand(string str, MacroContainer& macroContainer, Options& configuration);
 
-void dealWithUser(MacroContainer& macroContainer);
+void dealWithUser(MacroContainer& macroContainer, Options& configuration);
 
 #endif // COMMAND_HPP

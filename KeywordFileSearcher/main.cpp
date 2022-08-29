@@ -72,7 +72,8 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
         }
 
 
-        if(replaceKeywordFile(str1, keywordSearched, real)){
+        if(readFile(str1, {keywordReplaced})
+        && replaceKeywordFile(str1, keywordSearched, real)){
             output << str1 << endl;
             nbOccurences++;
         }

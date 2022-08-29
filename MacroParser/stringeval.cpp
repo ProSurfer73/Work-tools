@@ -265,7 +265,7 @@ bool calculateExpression(string& expr, const MacroContainer& macroContainer, boo
                 cout << "S&R:" << expr << endl;
             #endif
             if(config.doesPrintExprAtEveryStep()){
-                cout << "expr:" << expr << endl;
+                cout << expr << endl;
             }
 
             repeat = true;

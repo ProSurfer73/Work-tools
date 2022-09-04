@@ -36,7 +36,7 @@ unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywor
 
     for(const string& str1: fileCollection)
     {
-        if(readFile(str1, keywords)){
+        if(keywords.empty() || readFile(str1, keywords)){
             output << str1 << endl;
             nbOccurences++;
         }
@@ -133,6 +133,7 @@ int main()
     {
         cout << "please type extension (or nothing to continue): ";
         getline(cin, input);
+
 
         if(!input.empty())
             extensionsToKeep.emplace_back(input);

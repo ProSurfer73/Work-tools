@@ -93,6 +93,29 @@ bool hasEnding (std::string const &fullString, std::string const &ending)
 }
 
 
+void filterFilepathByEnding(std::vector<std::string>& fileCollection, const std::vector<std::string>& extensionsToKeep)
+{
+    for(auto it = fileCollection.begin(); it!=fileCollection.end();)
+    {
+        // Is the extension of the file among the list of extensions to keep
+        bool shouldKeep=false;
+        for(const string& curExt : extensionsToKeep)
+        {
+            if(hasEnding(*it, curExt)){
+                shouldKeep = true;
+                break;
+            }
+        }
+
+        // Erase the filepath
+        if(!shouldKeep)
+            it = fileCollection.erase(it);
+        else
+            ++it;
+    }
+}
+
+
 
 int main()
 {
@@ -110,11 +133,16 @@ int main()
 
     stringvec keywords;
 
+    stringvec fileCollection;
+
+    std::thread thread(explore_directory, std::ref(dir), std::ref(fileCollection) );
+
+
     string input;
 
     do
     {
-        std::cout << "Please type a string you would like to search:" << endl;
+        std::cout << "\nPlease type a string you would like to search:" << endl;
         getline(cin, input);
 
         if(!input.empty())
@@ -122,16 +150,11 @@ int main()
     }
     while(!input.empty());
 
-
-    stringvec fileCollection;
-
-    explore_directory(dir, fileCollection);
-
     stringvec extensionsToKeep;
 
     do
     {
-        cout << "please type extension (or nothing to continue): ";
+        cout << "\nPlease type extension (or nothing to continue): ";
         getline(cin, input);
 
 
@@ -140,27 +163,12 @@ int main()
     }
     while(!input.empty());
 
+    thread.join();
+
 
     if(!extensionsToKeep.empty())
     {
-        for(auto it = fileCollection.begin(); it!=fileCollection.end();)
-        {
-            // Is the extension of the file among the list of extensions to keep
-            bool shouldKeep=false;
-            for(string& curExt : extensionsToKeep)
-            {
-                if(hasEnding(*it, curExt)){
-                    shouldKeep = true;
-                    break;
-                }
-            }
-
-            // Erase the filepath
-            if(!shouldKeep)
-                it = fileCollection.erase(it);
-            else
-                ++it;
-        }
+        thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::cref(extensionsToKeep));
     }
 
 
@@ -177,6 +185,7 @@ int main()
     // search mode
     if(input == "1")
     {
+        thread.join();
          nb = searchKeywords(fileCollection, keywords, cout);
     }
 
@@ -189,6 +198,8 @@ int main()
 
         cout << "add localising number to it ? (type 'y' if okay)" << endl;
         getline(cin, input);
+
+        thread.join();
 
 
          nb = replaceKeyword(fileCollection, keywords.front(), str2.c_str(), cout, (input[0]=='y'));

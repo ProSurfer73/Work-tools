@@ -34,53 +34,89 @@ static bool hasEnding (std::string const &fullString, std::string const &ending)
     }
 }
 
+#if (defined(_WIN32) || defined(_WIN64))
 
-BOOL DirectoryExists(LPCTSTR szPath)
+void explore_directory(const std::string& dirname, std::vector<std::string>& files)
 {
-  DWORD dwAttrib = GetFileAttributes(szPath);
-
-  return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
-         (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-}
-
-
-void read_directory(const std::string& name, stringvec& v)
-{
-    std::string pattern(name);
-    pattern.append("\\*");
     WIN32_FIND_DATA data;
     HANDLE hFind;
-    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
-        do {
-            v.emplace_back(data.cFileName);
-        } while (FindNextFile(hFind, &data) != 0);
+    if ((hFind = FindFirstFile((dirname+"\\*").c_str(), &data)) != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+                if(strcmp(data.cFileName, ".")!=0 && strcmp(data.cFileName, "..")!= 0){
+                    explore_directory(dirname+'\\'+data.cFileName,files);
+                }
+
+            }
+            else {
+                files.emplace_back(dirname+'\\'+data.cFileName);
+            }
+            //Sleep(500);
+        }
+        while (FindNextFile(hFind, &data) != 0);
+
         FindClose(hFind);
     }
 }
 
-void explore_directory(std::string directory_name, stringvec& fileCollection)
+
+bool directoryExists(const char* szPath)
 {
-   stringvec sv;
+  DWORD dwAttrib = GetFileAttributes(szPath);
 
-    // We look for all the files and folders that are in that directory
-    read_directory(directory_name, sv);
+  return (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
 
-    // We explore all teh different inputs
-    for(size_t i=0; i < sv.size(); ++i)
+#else
+
+#include <dirent.h>
+#include <sys/types.h>
+
+void explore_directory(std::string basepath, std::vector<std::string>& vec)
+{
+    struct dirent *dp;
+    DIR *dir = opendir(basepath.c_str());
+    if(!dir)
+        return;
+
+    basepath += '/';
+
+
+    while ((dp = readdir(dir)) != NULL)
     {
-        // IF there is a point then, it's a file
-        // Also it's important to note that filenames "." and ".." aren't files
-        // oldimplemntation: if(sv[i].find('.') != std::string::npos && sv[i]!="." && sv[i]!="..")
-        if(!DirectoryExists((directory_name+'\\'+sv[i]).c_str()) && sv[i]!="." && sv[i]!="..")
-            fileCollection.emplace_back(directory_name+'\\'+sv[i]);
 
-        // Else it's a folder, and you have to reexecute the function recursilvely
-        else if(sv[i]!="." && sv[i]!=".."){
-            explore_directory
-            (directory_name+'\\'+sv[i], fileCollection);
+
+        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
+        {
+
+            if(dp->d_type != DT_DIR){
+                vec.emplace_back(basepath+dp->d_name);
+            }
+            else {
+                // Construct new path from our base path
+                    explore_directory(basepath+dp->d_name, vec);
+            }
         }
     }
+
+    closedir(dir);
 }
+
+bool directoryExists(const char* basepath)
+{
+    DIR *dir = opendir(basepath);
+    bool isOpen = (dir != nullptr);
+
+    if(isOpen)
+        closedir(dir);
+
+    return isOpen;
+}
+
+
+#endif
 
 bool readFile(const string& path, const stringvec& words)
 {

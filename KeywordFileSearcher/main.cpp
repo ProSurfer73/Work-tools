@@ -168,6 +168,7 @@ int main()
 
     if(!extensionsToKeep.empty())
     {
+        thread.join();
         thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::cref(extensionsToKeep));
     }
 

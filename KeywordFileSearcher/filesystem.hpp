@@ -23,7 +23,7 @@ bool readFile(const string& path, const stringvec& words);
 
 bool readDirectory(string dir, vector< pair<string, string> >& defineList, stringvec& redefinedMacros);
 
-void explore_directory(std::string directory_name, stringvec& fileCollection);
+void explore_directory(const std::string& dirname, std::vector<std::string>& files);
 
 bool replaceKeywordFile(const string& path, const string& initialKeyword, const string& finalKeyword);
 

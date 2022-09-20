@@ -5,7 +5,7 @@
 using namespace std;
 
 
-void addNumberToStr(char* str, unsigned number)
+void addNumberToStr(std::string& str, unsigned number)
 {
     char strnum[15];
 
@@ -18,7 +18,7 @@ void addNumberToStr(char* str, unsigned number)
     else
         snprintf(strnum, 15, "%u", number);
 
-    strcat(str, strnum);
+    str += strnum;
 }
 
 
@@ -57,15 +57,13 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
 {
     unsigned nbOccurences=0;
 
-    char real[50];
-
-    strncpy(real, keywordReplaced, 50);
+    std::string real(keywordReplaced);
 
     for(const string& str1: fileCollection)
     {
         if(addNumberAtTheEnd){
             // Copy the initial string
-            strncpy(real, keywordReplaced, 50);
+            real = keywordReplaced;
 
             // Add the number string to it all
             addNumberToStr(real, nbOccurences);
@@ -122,6 +120,7 @@ int main()
     std::cout << "WELCOME TO KEYWORD SEARCHER" << endl;
     std::cout << "List files containing potentially string, with potential extension, inside a specified folder.\n" << endl;
 
+    reaskDirectory:
 
     std::cout << "Please type the directory: ";
 
@@ -131,11 +130,20 @@ int main()
     if(dir.empty())
         return 0;
 
-    stringvec keywords;
-
     stringvec fileCollection;
 
+    if(!directoryExists(dir.c_str())){
+        std::cout << "/!\\ The directory you entered does not seem to exist, please retry. /!\\\n" << std::endl;
+        goto reaskDirectory;
+    }
+
     std::thread thread(explore_directory, std::ref(dir), std::ref(fileCollection) );
+
+
+
+    stringvec keywords;
+
+
 
 
     string input;

@@ -17,7 +17,7 @@ typedef std::vector<std::string> stringvec;
 
 // Fucntions available
 
-BOOL DirectoryExists(LPCTSTR szPath);
+bool directoryExists(const char* basepath);
 
 bool readFile(const string& path, const stringvec& words);
 

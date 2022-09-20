@@ -1,8 +1,0 @@
-# depslib dependency file v1.0
-1645108774 source:c:\users\divouxje-adm\documents\codeblocks_projects\library_searcher\main.cpp
-	<iostream>
-	<vector>
-	<windows.h>
-	<fstream>
-	<algorithm>
-

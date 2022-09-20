@@ -1,9 +1,0 @@
-# depslib dependency file v1.0
-1660154562 source:c:\users\divouxje\documents\folder_compare\main.cpp
-	<iostream>
-	<vector>
-	<windows.h>
-	<fstream>
-	<algorithm>
-	<cassert>
-

@@ -120,10 +120,10 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, const std:
 int main()
 {
     std::cout << "WELCOME TO KEYWORD SEARCHER" << endl;
-    std::cout << "List all the files containing a specified string inside a specified folder.\n" << endl;
+    std::cout << "List files containing potentially string, with potential extension, inside a specified folder.\n" << endl;
 
 
-    std::cout << "Please type the directory:" << endl;
+    std::cout << "Please type the directory: ";
 
     string dir;
     getline(cin, dir);
@@ -140,9 +140,11 @@ int main()
 
     string input;
 
+    std::cout << std::endl;
+
     do
     {
-        std::cout << "\nPlease type a string you would like to search:" << endl;
+        std::cout << "Please type a string you would like to search: ";
         getline(cin, input);
 
         if(!input.empty())
@@ -152,9 +154,11 @@ int main()
 
     stringvec extensionsToKeep;
 
+    std::cout << std::endl;
+
     do
     {
-        cout << "\nPlease type extension (or nothing to continue): ";
+        cout << "Please type extension (or nothing to continue): ";
         getline(cin, input);
 
 
@@ -168,7 +172,6 @@ int main()
 
     if(!extensionsToKeep.empty())
     {
-        thread.join();
         thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::cref(extensionsToKeep));
     }
 
@@ -177,7 +180,7 @@ int main()
 
     reask:
 
-    cout << "Type 1 to search and 2 to replace:" << endl;
+    cout << "\nType 1 to search and 2 to replace:" << endl;
 
     getline(cin, input);
 

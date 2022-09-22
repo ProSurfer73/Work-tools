@@ -120,33 +120,34 @@ int main()
     std::cout << "WELCOME TO KEYWORD SEARCHER" << endl;
     std::cout << "List files containing potentially string, with potential extension, inside a specified folder.\n" << endl;
 
+    string input;
+
     reaskDirectory:
 
     std::cout << "Please type the directory: ";
 
-    string dir;
-    getline(cin, dir);
 
-    if(dir.empty())
+
+    try {
+
+    getline(cin, input);
+
+    if(input.empty())
         return 0;
 
     stringvec fileCollection;
 
-    if(!directoryExists(dir.c_str())){
+    if(!directoryExists(input.c_str())){
         std::cout << "/!\\ The directory you entered does not seem to exist, please retry. /!\\\n" << std::endl;
         goto reaskDirectory;
     }
 
-    std::thread thread(explore_directory, std::ref(dir), std::ref(fileCollection) );
+    std::thread thread(explore_directory, std::move(input), std::ref(fileCollection) );
 
 
 
     stringvec keywords;
 
-
-
-
-    string input;
 
     std::cout << std::endl;
 
@@ -175,11 +176,12 @@ int main()
     }
     while(!input.empty());
 
-    thread.join();
+
 
 
     if(!extensionsToKeep.empty())
     {
+        thread.join();
         thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::cref(extensionsToKeep));
     }
 
@@ -231,6 +233,13 @@ int main()
 
     std::cout << "\nThanks for trusting Search&Replace program." << endl;
     std::cout << "Press enter to exit" << endl;
+
+
+    }
+    catch(std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+    }
 
     getline(cin, input);
 

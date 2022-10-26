@@ -32,11 +32,14 @@ void addNumberToStr(std::string& str, unsigned number)
  */
 unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywords, std::ostream& output)
 {
+    if(keywords.empty())
+        return 0;
+
     unsigned nbOccurences=0;
 
     for(const string& str1: fileCollection)
     {
-        if(keywords.empty() || readFile(str1, keywords)){
+        if(readFile(str1, keywords)){
             output << str1 << endl;
             nbOccurences++;
         }
@@ -45,6 +48,23 @@ unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywor
     return nbOccurences;
 }
 
+
+unsigned searchKeywordsWithLines(const stringvec& fileCollection, const stringvec& keywords, std::ostream& output)
+{
+    if(keywords.empty())
+        return 0;
+
+    unsigned nbOccurences=0;
+
+    for(const string& str1: fileCollection)
+    {
+        if(readFileWithLine(str1, keywords, output)){
+            nbOccurences++;
+        }
+    }
+
+    return nbOccurences;
+}
 
 /** \brief Replace keywords (can add occurence number)
  *
@@ -190,7 +210,7 @@ int main()
 
     reask:
 
-    cout << "\nType 1 to search and 2 to replace:" << endl;
+    cout << "\nType 1 to search and 2 to replace (+: print involved lines):" << endl;
 
     getline(cin, input);
 
@@ -201,6 +221,11 @@ int main()
     {
         thread.join();
          nb = searchKeywords(fileCollection, keywords, cout);
+    }
+    else if(input == "1+")
+    {
+        thread.join();
+        nb = searchKeywordsWithLines(fileCollection, keywords, cout);
     }
 
     // replace mode
@@ -232,16 +257,23 @@ int main()
     std::cout << nb << " results found." << std::endl;
 
     std::cout << "\nThanks for trusting Search&Replace program." << endl;
-    std::cout << "Press enter to exit" << endl;
+    std::cout << "Press enter to exit, or notepad to open files in notepad++" << endl;
 
+    getline(cin, input);
+
+    if(input == "notepad")
+    {
+        // Let's launch notepad++ with all the files here
+    }
 
     }
     catch(std::exception& ex)
     {
         std::cout << ex.what() << std::endl;
+        getline(cin, input);
     }
 
-    getline(cin, input);
+
 
 
     return 0;

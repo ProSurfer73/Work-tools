@@ -27,7 +27,7 @@ void explore_directory(const std::string& dirname, std::vector<std::string>& fil
 
 bool replaceKeywordFile(const string& path, const string& initialKeyword, const string& finalKeyword);
 
-bool readFileWithLine(const std::string& path, const stringvec& words, std::ostream& output);
+bool readFileWithLine(std::string& path, stringvec& results, const stringvec& words, std::ostream& output);
 
 #endif // FILESYSTEM_HPP
 

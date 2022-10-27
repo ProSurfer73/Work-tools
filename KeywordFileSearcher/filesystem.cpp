@@ -268,7 +268,7 @@ bool replaceKeywordFile(const string& path, const string& initialKeyword, const 
 
 }
 
-bool readFileWithLine(const std::string& path, const stringvec& words, std::ostream& output)
+bool readFileWithLine(std::string& path, stringvec& results, const stringvec& words, std::ostream& output)
 {
     std::ifstream file(path);
 
@@ -286,8 +286,10 @@ bool readFileWithLine(const std::string& path, const stringvec& words, std::ostr
         {
             if(readLine.find(str) != std::string::npos)
             {
-                if(!found)
+                if(!found){
                     output << path << std::endl;
+                    results.push_back( std::move(path) );
+                }
 
                 output << 'l' << lineNumber << ": " << readLine << std::endl;
 

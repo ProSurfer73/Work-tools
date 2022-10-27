@@ -1,4 +1,7 @@
 #include <iostream>
+#if (defined(_WIN32) || defined(_WIN64) )
+    #include <windows.h>
+#endif
 
 #include "filesystem.hpp"
 
@@ -32,14 +35,11 @@ void addNumberToStr(std::string& str, unsigned number)
  */
 unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywords, std::ostream& output)
 {
-    if(keywords.empty())
-        return 0;
-
     unsigned nbOccurences=0;
 
     for(const string& str1: fileCollection)
     {
-        if(readFile(str1, keywords)){
+        if(keywords.empty() || readFile(str1, keywords)){
             output << str1 << endl;
             nbOccurences++;
         }
@@ -49,16 +49,13 @@ unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywor
 }
 
 
-unsigned searchKeywordsWithLines(const stringvec& fileCollection, const stringvec& keywords, std::ostream& output)
+unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, const stringvec& keywords, std::ostream& output)
 {
-    if(keywords.empty())
-        return 0;
-
     unsigned nbOccurences=0;
 
-    for(const string& str1: fileCollection)
+    for(string& str1: fileCollection)
     {
-        if(readFileWithLine(str1, keywords, output)){
+        if(keywords.empty() || readFileWithLine(str1, results, keywords, output)){
             nbOccurences++;
         }
     }
@@ -216,6 +213,8 @@ int main()
 
     unsigned nb=0;
 
+    stringvec results;
+
     // search mode
     if(input == "1")
     {
@@ -225,7 +224,7 @@ int main()
     else if(input == "1+")
     {
         thread.join();
-        nb = searchKeywordsWithLines(fileCollection, keywords, cout);
+        nb = searchKeywordsWithLines(fileCollection, results, keywords, cout);
     }
 
     // replace mode
@@ -264,6 +263,18 @@ int main()
     if(input == "notepad")
     {
         // Let's launch notepad++ with all the files here
+
+        #if (defined(_WIN32) || defined(_WIN64))
+
+
+
+        //CreateProcess("C:\\Programs\\Notepad++\\notepad++.exe", "", );
+
+
+        #endif // defined
+
+
+
     }
 
     }

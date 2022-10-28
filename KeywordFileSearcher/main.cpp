@@ -219,12 +219,16 @@ int main()
     if(input == "1")
     {
         thread.join();
-         nb = searchKeywords(fileCollection, keywords, cout);
+        nb = searchKeywords(fileCollection, keywords, cout);
     }
     else if(input == "1+")
     {
         thread.join();
-        nb = searchKeywordsWithLines(fileCollection, results, keywords, cout);
+
+        if(keywords.empty())
+            nb = searchKeywords(fileCollection, keywords, cout);
+        else
+            nb = searchKeywordsWithLines(fileCollection, results, keywords, cout);
     }
 
     // replace mode

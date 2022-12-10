@@ -5,6 +5,8 @@
 
 #include "filesystem.hpp"
 
+#include "history.hpp"
+
 using namespace std;
 
 
@@ -87,7 +89,7 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
         }
 
 
-        if(readFile(str1, {keywordReplaced})
+        if(readFile(str1, {keywordSearched})
         && replaceKeywordFile(str1, keywordSearched, real)){
             output << str1 << endl;
             nbOccurences++;
@@ -130,20 +132,28 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, const std:
     }
 }
 
-
+#include <windows.h>
 
 int main()
 {
     std::cout << "WELCOME TO KEYWORD SEARCHER" << endl;
     std::cout << "List files containing potentially string, with potential extension, inside a specified folder.\n" << endl;
 
-    string input;
+
+
+    History history;
+
+
+    history.showPossibilities("directories");
+
+    std::cout << std::endl;
+
 
     reaskDirectory:
 
     std::cout << "Please type the directory: ";
 
-
+    string input;
 
     try {
 
@@ -152,14 +162,19 @@ int main()
     if(input.empty())
         return 0;
 
-    stringvec fileCollection;
+    history.tryPossibilities(input, "directories");
 
-    if(!directoryExists(input.c_str())){
+    if(!directoryExists(input.c_str())) {
         std::cout << "/!\\ The directory you entered does not seem to exist, please retry. /!\\\n" << std::endl;
         goto reaskDirectory;
     }
 
-    std::thread thread(explore_directory, std::move(input), std::ref(fileCollection) );
+    stringvec fileCollection;
+
+    std::thread thread(explore_directory, std::cref(input), std::ref(fileCollection) );
+
+    history.pushHistory("directories", input);
+
 
 
 
@@ -168,13 +183,19 @@ int main()
 
     std::cout << std::endl;
 
+    history.showPossibilities("search");
+
     do
     {
         std::cout << "Please type a string you would like to search: ";
         getline(cin, input);
 
+        history.tryPossibilities(input, "search");
+
         if(!input.empty())
             keywords.emplace_back(input);
+
+        history.pushHistory("search", input);
     }
     while(!input.empty());
 
@@ -182,14 +203,20 @@ int main()
 
     std::cout << std::endl;
 
+    history.showPossibilities("extension");
+
     do
     {
         cout << "Please type extension (or nothing to continue): ";
         getline(cin, input);
 
+        history.tryPossibilities(input, "extension");
+
 
         if(!input.empty())
             extensionsToKeep.emplace_back(input);
+
+        history.pushHistory("extension", input);
     }
     while(!input.empty());
 
@@ -199,6 +226,7 @@ int main()
     if(!extensionsToKeep.empty())
     {
         thread.join();
+        std::cout << "size: " << fileCollection.size() << std::endl;
         thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::cref(extensionsToKeep));
     }
 
@@ -234,9 +262,13 @@ int main()
     // replace mode
     else if(input == "2")
     {
+        history.showPossibilities("replace");
+
         cout << "Type the string to replace:" << endl;
         string str2;
         getline(cin, str2);
+
+        history.tryPossibilities(str2, "replace");
 
         cout << "add localising number to it ? (type 'y' if okay)" << endl;
         getline(cin, input);

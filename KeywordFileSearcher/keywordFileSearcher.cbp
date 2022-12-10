@@ -35,6 +35,8 @@
 		</Compiler>
 		<Unit filename="filesystem.cpp" />
 		<Unit filename="filesystem.hpp" />
+		<Unit filename="history.cpp" />
+		<Unit filename="history.hpp" />
 		<Unit filename="main.cpp" />
 		<Extensions />
 	</Project>

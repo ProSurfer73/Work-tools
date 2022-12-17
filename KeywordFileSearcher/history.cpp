@@ -26,7 +26,7 @@ bool History::loadFromFile(const std::string& str)
         return false;
 
     std::string lineRead;
-    std::vector<std::string> *v = nullptr;
+    std::deque<std::string> *v = nullptr;
 
     while(getline(file, lineRead))
     {
@@ -35,12 +35,14 @@ bool History::loadFromFile(const std::string& str)
             std::string toBeAdded = lineRead.substr(4);
             clearSpaces(toBeAdded);
 
-            tables.emplace_back( std::move(toBeAdded), std::vector<std::string>());
+            tables.emplace_back( std::move(toBeAdded), std::deque<std::string>());
             v = &(tables.back().second);
         }
-        else if(v != nullptr && lineRead.substr(0,4)!="==> " && !lineRead.empty())
+        else if(v != nullptr && !lineRead.empty())
         {
-            v->push_back(lineRead);
+            // Let's not push twice the same value
+            if(std::find(v->begin(), v->end(), lineRead) == v->end())
+                v->push_back(lineRead);
         }
     }
 
@@ -57,12 +59,10 @@ bool History::saveToFile(const std::string& str)
 
     for(const auto& p : tables)
     {
-        std::cout << "==> " << std::endl;
         file << "==> " << p.first << std::endl;
 
         for(const std::string& s : p.second)
         {
-            std::cout << ">" << s << std::endl;
             file << s << std::endl;
         }
     }
@@ -71,7 +71,7 @@ bool History::saveToFile(const std::string& str)
 }
 
 
-std::vector<std::string>* History::getTableFrom(const std::string& str)
+std::deque<std::string>* History::getTableFrom(const std::string& str)
 {
     for(auto& p: tables)
     {
@@ -89,19 +89,47 @@ void History::pushHistory(const std::string& name, const std::string& value)
     if(p != nullptr)
     {
         // Let's first check if this entry does not already exist
-        if(std::find(p->begin(), p->end(), name) == p->end())
-            return;
+        for(auto it=p->begin(); it!=p->end(); ++it) {
+            if(*it == value){
+                p->push_front(std::move(*it));
+                p->erase(it);
+
+                // Let's save the file
+                if(!saveToFile(HISTORY_FILEPATH))
+                    std::cout << "Can't save history !" << std::endl;
+
+                return;
+            }
+        }
 
         if(p->size()>=MAX_HISTORY_ENTRY)
-            p->erase(p->begin());
+        {
+            // Let's first try to erase already existing item
+            bool hasBeenDeleted = false;
+            for(auto it1 = p->begin(); it1 != p->end() && hasBeenDeleted ; ++it1) {
+                for(auto it2 = p->begin() ; it2 != p->end() && hasBeenDeleted ; ++it2) {
+                    // If we have seperate items having the same value
+                    if(it1 != it2 && *it1 == *it2) {
+                        it1 = p->erase(it1);
+                        hasBeenDeleted = true;
+                    }
+                }
+            }
 
-        p->push_back(value);
+            if(!hasBeenDeleted)
+                p->pop_back();
+        }
+
+        std::cout << "pushfront" << std::endl;
+
+        // Let's push front
+        p->push_front(value);
     }
     else
     {
 
         // let's add another table
-        tables.emplace_back(name, std::vector<std::string>({value}));
+        tables.emplace_back(name, std::deque<std::string>({value}));
     }
 
     // Let's save the file

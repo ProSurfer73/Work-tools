@@ -3,12 +3,13 @@
 
 #include <fstream>
 #include <vector>
+#include <deque>
 #include <string>
 #include <algorithm>
 #include <iostream>
 
 #define HISTORY_FILEPATH "history.txt"
-#define MAX_HISTORY_ENTRY 3
+#define MAX_HISTORY_ENTRY 5
 
 class History
 {
@@ -21,7 +22,7 @@ public:
     bool saveToFile(const std::string& str);
 
     // Access and modify history
-    std::vector<std::string>* getTableFrom(const std::string& str);
+    std::deque<std::string>* getTableFrom(const std::string& str);
     void pushHistory(const std::string& name, const std::string& value);
 
     // High-level functions related to console application
@@ -30,7 +31,7 @@ public:
     void describeContent();
 
 private:
-    std::vector< std::pair< std::string, std::vector<std::string> > > tables;
+    std::vector< std::pair< std::string, std::deque<std::string> > > tables;
 };
 
 

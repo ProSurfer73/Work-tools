@@ -146,8 +146,6 @@ int main()
 
     history.showPossibilities("directories");
 
-    std::cout << std::endl;
-
 
     reaskDirectory:
 
@@ -171,9 +169,7 @@ int main()
 
     stringvec fileCollection;
 
-    std::thread thread(explore_directory, std::cref(input), std::ref(fileCollection) );
-
-    history.pushHistory("directories", input);
+    std::thread thread(explore_directory, input, std::ref(fileCollection) );
 
 
 
@@ -183,19 +179,28 @@ int main()
 
     std::cout << std::endl;
 
-    history.showPossibilities("search");
+    bool savedDirectory=false;
 
     do
     {
+        history.showPossibilities("search");
         std::cout << "Please type a string you would like to search: ";
-        getline(cin, input);
-
-        history.tryPossibilities(input, "search");
 
         if(!input.empty())
-            keywords.emplace_back(input);
+        {
+            if(savedDirectory)
+            {
+                history.tryPossibilities(input, "search");
+                keywords.emplace_back(input);
+                history.pushHistory("search", input);
+            }
+            else
+            {
+                history.pushHistory("directories", input);
+            }
+        }
 
-        history.pushHistory("search", input);
+        getline(cin, input);
     }
     while(!input.empty());
 
@@ -203,20 +208,22 @@ int main()
 
     std::cout << std::endl;
 
+    input.clear();
+
     history.showPossibilities("extension");
 
     do
     {
         cout << "Please type extension (or nothing to continue): ";
-        getline(cin, input);
-
-        history.tryPossibilities(input, "extension");
-
 
         if(!input.empty())
+        {
+            history.tryPossibilities(input, "extension");
             extensionsToKeep.emplace_back(input);
+            history.pushHistory("extension", input);
+        }
 
-        history.pushHistory("extension", input);
+        getline(cin, input);
     }
     while(!input.empty());
 

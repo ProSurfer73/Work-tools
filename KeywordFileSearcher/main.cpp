@@ -178,12 +178,12 @@ int main()
 
 
     std::cout << std::endl;
+    history.showPossibilities("search");
 
     bool savedDirectory=false;
 
     do
     {
-        history.showPossibilities("search");
         std::cout << "Please type a string you would like to search: ";
 
         if(!input.empty())
@@ -197,6 +197,7 @@ int main()
             else
             {
                 history.pushHistory("directories", input);
+                savedDirectory=true;
             }
         }
 

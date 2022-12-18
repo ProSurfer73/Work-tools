@@ -120,8 +120,6 @@ void History::pushHistory(const std::string& name, const std::string& value)
                 p->pop_back();
         }
 
-        std::cout << "pushfront" << std::endl;
-
         // Let's push front
         p->push_front(value);
     }

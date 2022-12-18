@@ -1,0 +1,14 @@
+==> directories
+C:\Users\divouxje\Desktop\test
+C:\trusted-firmware-m-TF-Mv1.6.0\platform\ext\target\stm
+psa_generate_random(
+C:\trusted-firmware-m-TF-Mv1.6.0
+psa_generate_random
+==> search
+toto
+int main(
+C:\Users\divouxje\Desktop\test
+C:\git
+psa_generate_random(
+==> extension
+1+

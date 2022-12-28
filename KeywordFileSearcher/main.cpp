@@ -4,7 +4,7 @@
 #endif
 
 #include "filesystem.hpp"
-
+#include "closestr.hpp"
 #include "history.hpp"
 
 using namespace std;
@@ -110,13 +110,27 @@ bool hasEnding (std::string const &fullString, std::string const &ending)
 }
 
 
-void filterFilepathByEnding(std::vector<std::string>& fileCollection, const std::vector<std::string>& extensionsToKeep)
+void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vector<std::string>& extensions)
 {
+    // Let's check waht type of list it is
+    bool listOfExtensionsToKeep = true;
+    for(string& ext : extensions)
+    {
+        if(ext.front()=='$'){
+            listOfExtensionsToKeep = false;
+            ext = ext.substr(1);
+        }
+    }
+
+    if(listOfExtensionsToKeep)
+    {
+
+    // Case 1: list of extensions to keep
     for(auto it = fileCollection.begin(); it!=fileCollection.end();)
     {
         // Is the extension of the file among the list of extensions to keep
         bool shouldKeep=false;
-        for(const string& curExt : extensionsToKeep)
+        for(const string& curExt : extensions)
         {
             if(hasEnding(*it, curExt)){
                 shouldKeep = true;
@@ -130,22 +144,66 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, const std:
         else
             ++it;
     }
+
+    }
+    else
+    {
+
+    // Case 2: list of extensions to avoid
+
+    for(auto it = fileCollection.begin(); it!=fileCollection.end();)
+    {
+        // Is the extension of the file among the list of extensions to keep
+        bool shouldKeep=true;
+
+        for(string& ext : extensions)
+        {
+            if(hasEnding(*it, ext)){
+                shouldKeep = false;
+                break;
+            }
+        }
+
+        // Erase the filepath
+        if(!shouldKeep)
+            it = fileCollection.erase(it);
+        else
+            ++it;
+    }
+
+    }
 }
 
 #include <windows.h>
+
+bool launchProgram(History& history);
 
 int main()
 {
     std::cout << "WELCOME TO KEYWORD SEARCHER" << endl;
     std::cout << "List files containing potentially string, with potential extension, inside a specified folder.\n" << endl;
 
-
-
     History history;
 
+    try
+    {
+        // Let's launch and restart the program as long as the user wants to
+        while(launchProgram(history));
+    }
+    catch(const std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        std::string tmp;
+        getline(cin, tmp);
+    }
 
+
+    return 0;
+}
+
+bool launchProgram(History& history)
+{
     history.showPossibilities("directories");
-
 
     reaskDirectory:
 
@@ -153,12 +211,10 @@ int main()
 
     string input;
 
-    try {
-
     getline(cin, input);
 
     if(input.empty())
-        return 0;
+        return false;
 
     history.tryPossibilities(input, "directories");
 
@@ -235,7 +291,7 @@ int main()
     {
         thread.join();
         std::cout << "size: " << fileCollection.size() << std::endl;
-        thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::cref(extensionsToKeep));
+        thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::ref(extensionsToKeep));
     }
 
 
@@ -302,34 +358,27 @@ int main()
     std::cout << "\nThanks for trusting Search&Replace program." << endl;
     std::cout << "Press enter to exit, or notepad to open files in notepad++" << endl;
 
-    getline(cin, input);
-
-    if(input == "notepad")
+    while(getline(cin, input))
     {
-        // Let's launch notepad++ with all the files here
-
-        #if (defined(_WIN32) || defined(_WIN64))
-
-
-
-        //CreateProcess("C:\\Programs\\Notepad++\\notepad++.exe", "", );
+        if(isRoughlyEqualTo("notepad",input))
+        {
+            // Let's launch notepad++ with all the files here
 
 
-        #endif // defined
-
-
-
-    }
-
-    }
-    catch(std::exception& ex)
-    {
-        std::cout << ex.what() << std::endl;
-        getline(cin, input);
+        }
+        else if(isRoughlyEqualTo("restart",input))
+        {
+            return true;
+        }
+        else if(input.empty())
+        {
+            break;
+        }
     }
 
 
 
 
-    return 0;
+
+    return false;
 }

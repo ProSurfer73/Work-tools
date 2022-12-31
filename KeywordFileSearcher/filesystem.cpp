@@ -128,10 +128,8 @@ bool readFile(const string& path, const stringvec& words)
 {
     ifstream file(path);
 
-    if(!file){
-        cerr << "Can't open file:" << path << endl;
+    if(!file)
         return false;
-    }
 
     bool found = false;
     string const* keyword = nullptr;

@@ -13,3 +13,6 @@ Debug
 # IDE useless files
 *.cscope_file_list
 *.depend
+
+# No need for text files
+*.txt

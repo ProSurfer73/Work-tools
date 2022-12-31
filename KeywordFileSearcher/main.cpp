@@ -35,15 +35,20 @@ void addNumberToStr(std::string& str, unsigned number)
  * \return the number of files having at least one occurences
  *
  */
-unsigned searchKeywords(const stringvec& fileCollection, const stringvec& keywords, std::ostream& output)
+unsigned searchKeywords(stringvec&& fileCollection, const stringvec& keywords, std::ostream& output, std::vector<std::string>& warnings)
 {
     unsigned nbOccurences=0;
 
-    for(const string& str1: fileCollection)
+    for(string& str1: fileCollection)
     {
         if(keywords.empty() || readFile(str1, keywords)){
             output << str1 << endl;
             nbOccurences++;
+        }
+        else if(!keywords.empty())
+        {
+            // we couldn't open this file, so let's add it to warnings
+            warnings.emplace_back(std::move(str1));
         }
     }
 
@@ -109,6 +114,17 @@ bool hasEnding (std::string const &fullString, std::string const &ending)
     }
 }
 
+bool hasEndingWhatever(const std::string& fullString, const std::string& ending)
+{
+    int start = fullString.size()-ending.size();
+
+    for(int i=0; i<ending.size(); ++i){
+        if(toupper(fullString[i+start])!=toupper(ending[i]))
+            return false;
+    }
+    return true;
+}
+
 
 void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vector<std::string>& extensions)
 {
@@ -132,7 +148,7 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vecto
         bool shouldKeep=false;
         for(const string& curExt : extensions)
         {
-            if(hasEnding(*it, curExt)){
+            if(hasEndingWhatever(*it, curExt)){
                 shouldKeep = true;
                 break;
             }
@@ -158,7 +174,7 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vecto
 
         for(string& ext : extensions)
         {
-            if(hasEnding(*it, ext)){
+            if(hasEndingWhatever(*it, ext)){
                 shouldKeep = false;
                 break;
             }
@@ -301,6 +317,9 @@ bool launchProgram(History& history)
 
     cout << "\nType 1 to search and 2 to replace (+: print involved lines):" << endl;
 
+    std::vector<std::string> warnings;
+    warnings.reserve(fileCollection.size()/5);
+
     getline(cin, input);
 
     unsigned nb=0;
@@ -311,14 +330,14 @@ bool launchProgram(History& history)
     if(input == "1")
     {
         thread.join();
-        nb = searchKeywords(fileCollection, keywords, cout);
+        nb = searchKeywords(std::move(fileCollection), keywords, cout, warnings);
     }
     else if(input == "1+")
     {
         thread.join();
 
         if(keywords.empty())
-            nb = searchKeywords(fileCollection, keywords, cout);
+            nb = searchKeywords(std::move(fileCollection), keywords, cout, warnings);
         else
             nb = searchKeywordsWithLines(fileCollection, results, keywords, cout);
     }
@@ -354,23 +373,38 @@ bool launchProgram(History& history)
 
 
     std::cout << nb << " results found." << std::endl;
+    std::cout << "warning: " << warnings.size() << " files could not be opened." << std::endl;
 
     std::cout << "\nThanks for trusting Search&Replace program." << endl;
-    std::cout << "Press enter to exit, or notepad to open files in notepad++" << endl;
+    std::cout << "Press enter to exit";
+    if(!results.empty())
+        std::cout << ", or notepad to open files in notepad++";
+    if(!warnings.empty())
+        std::cout << ", or 'errors' to show the list of files that could not be opened.";
+    std::cout << std::endl;
 
-    while(getline(cin, input))
+    while(std::cout << "\n > " && getline(cin, input))
     {
         if(isRoughlyEqualTo("notepad",input))
         {
             // Let's launch notepad++ with all the files here
 
-
+            // ! To be implemented !
         }
         else if(isRoughlyEqualTo("restart",input))
         {
             return true;
         }
-        else if(input.empty())
+        else if(isRoughlyEqualTo("errors", input))
+        {
+            // Let's display warnings
+
+            std::cout << "\Below, the list of files that could not be opened:" << std::endl;
+            for(const std::string& s: warnings)
+                std::cout << s << std::endl;
+        }
+
+        else if(input.empty() || isRoughlyEqualTo(input,"exit"))
         {
             break;
         }

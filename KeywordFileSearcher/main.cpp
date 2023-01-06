@@ -35,13 +35,14 @@ void addNumberToStr(std::string& str, unsigned number)
  * \return the number of files having at least one occurences
  *
  */
-unsigned searchKeywords(stringvec&& fileCollection, const stringvec& keywords, std::ostream& output, std::vector<std::string>& warnings)
+unsigned searchKeywords(stringvec& fileCollection, stringvec& keywords, std::ostream& output, std::vector<std::string>& warnings)
 {
     unsigned nbOccurences=0;
+    bool hasInsensitive = tamperInsensitive(keywords);
 
     for(string& str1: fileCollection)
     {
-        if(keywords.empty() || readFile(str1, keywords)){
+        if(keywords.empty() || readFile(str1, keywords, hasInsensitive)){
             output << str1 << endl;
             nbOccurences++;
         }
@@ -56,13 +57,14 @@ unsigned searchKeywords(stringvec&& fileCollection, const stringvec& keywords, s
 }
 
 
-unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, const stringvec& keywords, std::ostream& output)
+unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, stringvec& keywords, std::ostream& output)
 {
     unsigned nbOccurences=0;
+    bool hasInsensitive = tamperInsensitive(keywords);
 
     for(string& str1: fileCollection)
     {
-        if(keywords.empty() || readFileWithLine(str1, results, keywords, output)){
+        if(keywords.empty() || readFileWithLine(str1, results, keywords, output, hasInsensitive)){
             nbOccurences++;
         }
     }
@@ -82,6 +84,8 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
     unsigned nbOccurences=0;
 
     std::string real(keywordReplaced);
+    std::vector<std::string> tmp = {keywordSearched};
+    bool hasInsensitive = tamperInsensitive(tmp);
 
     for(const string& str1: fileCollection)
     {
@@ -93,8 +97,7 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
             addNumberToStr(real, nbOccurences);
         }
 
-
-        if(readFile(str1, {keywordSearched})
+        if(readFile(str1, tmp, hasInsensitive)
         && replaceKeywordFile(str1, keywordSearched, real)){
             output << str1 << endl;
             nbOccurences++;
@@ -306,7 +309,7 @@ bool launchProgram(History& history)
     if(!extensionsToKeep.empty())
     {
         thread.join();
-        std::cout << "size: " << fileCollection.size() << std::endl;
+        //std::cout << "size: " << fileCollection.size() << std::endl;
         thread = std::thread(filterFilepathByEnding, std::ref(fileCollection), std::ref(extensionsToKeep));
     }
 
@@ -330,14 +333,14 @@ bool launchProgram(History& history)
     if(input == "1")
     {
         thread.join();
-        nb = searchKeywords(std::move(fileCollection), keywords, cout, warnings);
+        nb = searchKeywords(fileCollection, keywords, cout, warnings);
     }
     else if(input == "1+")
     {
         thread.join();
 
         if(keywords.empty())
-            nb = searchKeywords(std::move(fileCollection), keywords, cout, warnings);
+            nb = searchKeywords(fileCollection, keywords, cout, warnings);
         else
             nb = searchKeywordsWithLines(fileCollection, results, keywords, cout);
     }
@@ -373,7 +376,8 @@ bool launchProgram(History& history)
 
 
     std::cout << nb << " results found." << std::endl;
-    std::cout << "warning: " << warnings.size() << " files could not be opened." << std::endl;
+    if(!warnings.empty())
+        std::cout << "warning: " << warnings.size() << " files could not be opened." << std::endl;
 
     std::cout << "\nThanks for trusting Search&Replace program." << endl;
     std::cout << "Press enter to exit";

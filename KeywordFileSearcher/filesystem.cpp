@@ -124,44 +124,46 @@ bool directoryExists(const char* basepath)
 
 #endif
 
-bool readFile(const string& path, const stringvec& words)
+bool readFile(const string& path, stringvec& words, bool hasInsensitive)
 {
     ifstream file(path);
 
     if(!file)
         return false;
 
-    bool found = false;
-    string const* keyword = nullptr;
-    unsigned counter = 0;
-    char readCharacter;
+    std::string line;
 
-    while(!found && file.get(readCharacter))
+    while(std::getline(file, line))
     {
-        if(!keyword)
+        for(const std::string& str: words)
         {
-            for(unsigned i=0; i<words.size(); ++i){
-                if(words[i][0] == readCharacter){
-                    keyword = &(words[i]);
-                    counter = 1;
-                }
+            // if it starts with '#', it means that we have to treat it case insensitive
+            if(str.front() != '#' && line.find(str) != std::string::npos) {
+                return true;
             }
         }
-        else if( (*keyword)[counter] == readCharacter)
+
+        if(hasInsensitive)
         {
-            counter++;
+
+        for(char& c: line) {
+            c = toupper(c);
         }
-        else if( (*keyword)[counter] == '\0')
+
+        for(const std::string& str : words)
         {
-            found = true;
+            // if it starts with '#', it means that we have to treat it case insensitive
+            if(str.front() == '#' && line.find(str.substr(1)) != std::string::npos) {
+                return true;
+            }
         }
-        else
-            counter = 0;
+
+        }
     }
 
-    return found;
+    // if we end up here, the word has not been found
+    return false;
 }
-
 
 
 // Function to replace all the occurrences
@@ -246,11 +248,16 @@ bool replaceKeywordFile(const string& path, const string& initialKeyword, const 
 
     file.close();
 
-    // If the word is in it
-    if(total.find(initialKeyword) != string::npos)
+    // Replace the word
+    replace_all(total, initialKeyword, finalKeyword);
+
+    // Let's check for insensitive words
+    if(initialKeyword.front() == '#')
     {
-        // Replace the word
-        replace_all(total, initialKeyword, finalKeyword);
+        // Let's uppercase the whole string corresponding to the file
+
+        std::cout << "Not yet implemented!" << std::endl;
+        // let's implement here 'replace_all_insensitive'
     }
 
     // Let's rewrite the modified content into the file
@@ -272,7 +279,7 @@ bool replaceKeywordFile(const string& path, const string& initialKeyword, const 
 
 }
 
-bool readFileWithLine(std::string& path, stringvec& results, const stringvec& words, std::ostream& output)
+bool readFileWithLine(std::string& path, stringvec& results, const stringvec& words, std::ostream& output, bool containsInsensitive)
 {
     std::ifstream file(path);
 
@@ -290,14 +297,33 @@ bool readFileWithLine(std::string& path, stringvec& results, const stringvec& wo
         {
             if(readLine.find(str) != std::string::npos)
             {
-                if(!found){
+                if(!found)
+                {
                     output << path << std::endl;
                     results.push_back( std::move(path) );
+                    found = true;
                 }
-
                 output << 'l' << lineNumber << ": " << readLine << std::endl;
+            }
+        }
 
-                found = true;
+        if(containsInsensitive)
+        {
+            for(const std::string& str : words)
+            {
+                if(str.front()=='#')
+                {
+                    unsigned j=1;
+                    for(unsigned i=0; i<readLine.size(); ++i){
+                        if(str[j] == toupper(readLine[i])){
+                            if(++j >= str.size()){
+                                output << 'l' << lineNumber << ": " << readLine << std::endl;
+                            }
+                        }
+                        else
+                            j=1;
+                    }
+                }
             }
         }
 

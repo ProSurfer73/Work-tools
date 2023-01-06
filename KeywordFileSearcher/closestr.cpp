@@ -46,3 +46,33 @@ bool isRoughlyEqualTo(const std::string& original, const std::string& current)
 }
 
 #endif
+
+#include <cstring>
+
+bool tamperInsensitive(std::vector<std::string>& vstr)
+{
+    bool myreturn=false;
+
+    for(std::string& str: vstr)
+    {
+        if(tamperInsensitive(str))
+            myreturn=true;
+
+    }
+
+    return myreturn;
+}
+
+bool tamperInsensitive(std::string& str)
+{
+    if(!str.empty() && str.front()=='#')
+    {
+        for(char& c: str) {
+            c = std::toupper(c);
+        }
+
+        return true;
+    }
+
+    return false;
+}

@@ -29,5 +29,13 @@ bool replaceKeywordFile(const string& path, const string& initialKeyword, const 
 
 bool readFileWithLine(std::string& path, stringvec& results, const stringvec& words, std::ostream& output, bool containsInsensitive);
 
+
+// When a file could not be opened, an exception of this type is launched
+class FileException
+{
+    // For optimization reasons, we don't reference the name of the file inside the exception
+    const char* what();
+};
+
 #endif // FILESYSTEM_HPP
 

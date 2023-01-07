@@ -42,13 +42,15 @@ unsigned searchKeywords(stringvec& fileCollection, stringvec& keywords, std::ost
 
     for(string& str1: fileCollection)
     {
-        if(keywords.empty() || readFile(str1, keywords, hasInsensitive)){
-            output << str1 << endl;
-            nbOccurences++;
-        }
-        else if(!keywords.empty())
+        try
         {
-            // we couldn't open this file, so let's add it to warnings
+            if(keywords.empty() || readFile(str1, keywords, hasInsensitive)){
+                output << str1 << endl;
+                nbOccurences++;
+            }
+        }
+        catch(const FileException& e) {
+            // we couldn't open this file, so let's add it to the warning list
             warnings.emplace_back(std::move(str1));
         }
     }
@@ -57,15 +59,22 @@ unsigned searchKeywords(stringvec& fileCollection, stringvec& keywords, std::ost
 }
 
 
-unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, stringvec& keywords, std::ostream& output)
+unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, stringvec& keywords, std::ostream& output, stringvec& warnings)
 {
     unsigned nbOccurences=0;
     bool hasInsensitive = tamperInsensitive(keywords);
 
     for(string& str1: fileCollection)
     {
-        if(keywords.empty() || readFileWithLine(str1, results, keywords, output, hasInsensitive)){
-            nbOccurences++;
+        try
+        {
+            if(keywords.empty() || readFileWithLine(str1, results, keywords, output, hasInsensitive)){
+                nbOccurences++;
+            }
+        }
+        catch(const FileException& e)
+        {
+            warnings.push_back( std::move(str1) );
         }
     }
 
@@ -79,7 +88,7 @@ unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, 
  * \return
  *
  */
-unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSearched, const char* keywordReplaced, std::ostream& output, bool addNumberAtTheEnd)
+unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSearched, const char* keywordReplaced, std::ostream& output, bool addNumberAtTheEnd, stringvec& warnings)
 {
     unsigned nbOccurences=0;
 
@@ -97,10 +106,19 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
             addNumberToStr(real, nbOccurences);
         }
 
+        try
+        {
+
         if(readFile(str1, tmp, hasInsensitive)
         && replaceKeywordFile(str1, keywordSearched, real)){
             output << str1 << endl;
             nbOccurences++;
+        }
+
+        }
+        catch(const FileException& e)
+        {
+            warnings.push_back( std::move(str1) );
         }
     }
 
@@ -348,7 +366,7 @@ bool launchProgram(History& history)
         if(keywords.empty())
             nb = searchKeywords(fileCollection, keywords, cout, warnings);
         else
-            nb = searchKeywordsWithLines(fileCollection, results, keywords, cout);
+            nb = searchKeywordsWithLines(fileCollection, results, keywords, cout, warnings);
     }
 
     // replace mode
@@ -368,7 +386,7 @@ bool launchProgram(History& history)
         thread.join();
 
 
-         nb = replaceKeyword(fileCollection, keywords.front(), str2.c_str(), cout, (input[0]=='y'));
+         nb = replaceKeyword(fileCollection, keywords.front(), str2.c_str(), cout, (input[0]=='y'), warnings);
     }
 
     // Incorrect input

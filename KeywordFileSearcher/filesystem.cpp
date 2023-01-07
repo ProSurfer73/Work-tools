@@ -128,8 +128,9 @@ bool readFile(const string& path, stringvec& words, bool hasInsensitive)
 {
     ifstream file(path);
 
+    // We can't open the file, well, let's throw an exception
     if(!file)
-        return false;
+        throw FileException();
 
     std::string line;
 
@@ -230,10 +231,8 @@ bool replaceKeywordFile(const string& path, const string& initialKeyword, const 
 {
     ifstream file(path, ios::in);
 
-    if(!file){
-        cerr << "Can't read file:" << path << endl;
-        return false;
-    }
+    if(!file)
+        throw FileException();
 
     string total;
     string curLine;
@@ -284,7 +283,7 @@ bool readFileWithLine(std::string& path, stringvec& results, const stringvec& wo
     std::ifstream file(path);
 
     if(!file)
-        return false;
+        throw FileException();
 
     std::string readLine;
 
@@ -336,5 +335,7 @@ bool readFileWithLine(std::string& path, stringvec& results, const stringvec& wo
     return found;
 }
 
-
-
+const char* FileException::what()
+{
+    return "some file could not be opened.";
+}

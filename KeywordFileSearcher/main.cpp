@@ -117,12 +117,13 @@ bool hasEnding (std::string const &fullString, std::string const &ending)
     }
 }
 
+// only works with ending that are case insensitive and that have been tampered with
 bool hasEndingWhatever(const std::string& fullString, const std::string& ending)
 {
     int start = fullString.size()-ending.size();
 
-    for(int i=0; i<ending.size(); ++i){
-        if(toupper(fullString[i+start])!=toupper(ending[i]))
+    for(int i=1; i<ending.size(); ++i){
+        if(toupper(fullString[i+start])!=ending[i])
             return false;
     }
     return true;
@@ -131,6 +132,9 @@ bool hasEndingWhatever(const std::string& fullString, const std::string& ending)
 
 void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vector<std::string>& extensions)
 {
+    // Let's toupper extension that are marked case insensitive
+    tamperInsensitive(extensions);
+
     // Let's check waht type of list it is
     bool listOfExtensionsToKeep = true;
     for(string& ext : extensions)
@@ -151,7 +155,8 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vecto
         bool shouldKeep=false;
         for(const string& curExt : extensions)
         {
-            if(hasEndingWhatever(*it, curExt)){
+            if((curExt.front()=='#' && hasEndingWhatever(*it, curExt))
+             ||(curExt.front()!='#' && hasEnding(*it, curExt))){
                 shouldKeep = true;
                 break;
             }
@@ -175,9 +180,10 @@ void filterFilepathByEnding(std::vector<std::string>& fileCollection, std::vecto
         // Is the extension of the file among the list of extensions to keep
         bool shouldKeep=true;
 
-        for(string& ext : extensions)
+        for(string& curExt : extensions)
         {
-            if(hasEndingWhatever(*it, ext)){
+            if((curExt.front()=='#' && hasEndingWhatever(*it, curExt))
+             ||(curExt.front()!='#' && hasEnding(*it, curExt))){
                 shouldKeep = false;
                 break;
             }

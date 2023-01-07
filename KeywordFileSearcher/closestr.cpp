@@ -1,3 +1,4 @@
+#include <cstring>
 #include "closestr.hpp"
 
 #ifdef ENABLE_CLOSESTR
@@ -46,8 +47,6 @@ bool isRoughlyEqualTo(const std::string& original, const std::string& current)
 }
 
 #endif
-
-#include <cstring>
 
 bool tamperInsensitive(std::vector<std::string>& vstr)
 {

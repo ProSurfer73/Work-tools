@@ -1,5 +1,5 @@
 # Compiled Object files
-obj
+*.obj
 *.slo
 *.lo
 *.o
@@ -14,5 +14,5 @@ Debug
 *.cscope_file_list
 *.depend
 
-# No need for text files
-*.txt
+# No need to push my history
+history.txt

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #if (defined(_WIN32) || defined(_WIN64) )
     #include <windows.h>
 #endif
@@ -51,7 +52,7 @@ unsigned searchKeywords(stringvec& fileCollection, stringvec& keywords, std::ost
         }
         catch(const FileException& e) {
             // we couldn't open this file, so let's add it to the warning list
-            warnings.emplace_back(std::move(str1));
+            warnings.emplace_back(str1);
         }
     }
 
@@ -74,7 +75,7 @@ unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, 
         }
         catch(const FileException& e)
         {
-            warnings.push_back( std::move(str1) );
+            warnings.push_back(str1);
         }
     }
 
@@ -118,7 +119,7 @@ unsigned replaceKeyword(const stringvec& fileCollection, const string& keywordSe
         }
         catch(const FileException& e)
         {
-            warnings.push_back( std::move(str1) );
+            warnings.push_back(str1);
         }
     }
 
@@ -430,6 +431,27 @@ bool launchProgram(History& history)
             std::cout << "\Below, the list of files that could not be opened:" << std::endl;
             for(const std::string& s: warnings)
                 std::cout << s << std::endl;
+        }
+        else if(input == "deleteall")
+        {
+            // Let's ask confirmation from the user
+            std::cout << "Are you sure you wanna erase all the files listed above ?" << std::endl;
+            std::cout << "Please type 'yes' to confirm." << std::endl;
+
+
+            if(std::getline(std::cin, input) && input == "yes")
+            {
+                std::cout << "Please press enter to confirm every file being deleted." << std::endl;
+
+                for(const std::string& s: fileCollection)
+                {
+                    std::cout << s;
+                    std::getline(std::cin, input);
+
+                    if(remove(s.c_str())!=0)
+                        std::cout << "The file could not be deleted." << std::endl;
+                }
+            }
         }
 
         else if(input.empty() || isRoughlyEqualTo(input,"exit"))

@@ -454,6 +454,53 @@ bool launchProgram(History& history)
             }
         }
 
+        else if(input == "addend")
+        {
+            std::cout << "Please type the string you would to add at the end of the filename of the entries:" << std::endl;
+
+            std::string newEnd;
+            std::getline(std::cin, newEnd);
+
+            if(newEnd.find(' ')!=std::string::npos)
+            {
+                std::cout << "there is a space, are you sure ?" << std::endl;
+                std::getline(std::cin, input);
+            }
+
+
+            for(const std::string& s: fileCollection)
+            {
+                std::cout << s;
+                std::getline(std::cin, input);
+
+                if(rename(s.c_str(), (s+newEnd).c_str()) != 0)
+                    std::cout << "Couldn't rename the file sorry :(" << std::endl;
+            }
+        }
+
+        else if(input == "removeend")
+        {
+            std::cout << "Please type the end you would like to remove:";
+
+            std::string oldEnd;
+            std::getline(std::cin, oldEnd);
+
+            for(unsigned i=0; i<fileCollection.size(); ++i)
+            {
+                string s = fileCollection[i];
+
+                if(hasEnding(s, oldEnd))
+                {
+                    s.resize(s.size()-oldEnd.size());
+                    std::cout << s;
+                    std::getline(std::cin, input);
+
+                    if(rename(fileCollection[i].c_str(), s.c_str()) != 0)
+                        std::cout << "Can't rename that file :(" << std::endl;
+                }
+            }
+        }
+
         else if(input.empty() || isRoughlyEqualTo(input,"exit"))
         {
             break;

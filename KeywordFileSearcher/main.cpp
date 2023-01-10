@@ -46,7 +46,7 @@ unsigned searchKeywords(stringvec& fileCollection, stringvec& results, stringvec
         try
         {
             if(keywords.empty() || readFile(str1, keywords, hasInsensitive)){
-                output << str1 << endl;
+                output << str1 << std::endl;
                 results.push_back(str1);
                 nbOccurences++;
             }
@@ -71,7 +71,6 @@ unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, 
         try
         {
             if(keywords.empty() || readFileWithLine(str1, keywords, output, hasInsensitive)){
-                std::cout << str1 << std::endl;
                 results.push_back(str1);
                 nbOccurences++;
             }

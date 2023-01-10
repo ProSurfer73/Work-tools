@@ -296,8 +296,12 @@ bool readFileWithLine(std::string& path, const stringvec& words, std::ostream& o
         {
             if(readLine.find(str) != std::string::npos)
             {
+                if(!found)
+                {
+                    output << path << std::endl;
+                    found = true;
+                }
                 output << 'l' << lineNumber << ": " << readLine << std::endl;
-                found = true;
             }
         }
 
@@ -311,8 +315,13 @@ bool readFileWithLine(std::string& path, const stringvec& words, std::ostream& o
                     for(unsigned i=0; i<readLine.size(); ++i){
                         if(str[j] == toupper(readLine[i])){
                             if(++j >= str.size()){
+                                if(!found)
+                                { // Let's show the filepath first
+                                    output << path << std::endl;
+                                    found = true;
+                                }
                                 output << 'l' << lineNumber << ": " << readLine << std::endl;
-                                found = true;
+
                             }
                         }
                         else

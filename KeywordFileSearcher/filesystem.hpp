@@ -27,7 +27,7 @@ void explore_directory(std::string dirname, std::vector<std::string>& files);
 
 bool replaceKeywordFile(const string& path, const string& initialKeyword, const string& finalKeyword);
 
-bool readFileWithLine(std::string& path, stringvec& results, const stringvec& words, std::ostream& output, bool containsInsensitive);
+bool readFileWithLine(std::string& path, const stringvec& words, std::ostream& output, bool containsInsensitive);
 
 
 // When a file could not be opened, an exception of this type is launched

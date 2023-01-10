@@ -36,7 +36,7 @@ void addNumberToStr(std::string& str, unsigned number)
  * \return the number of files having at least one occurences
  *
  */
-unsigned searchKeywords(stringvec& fileCollection, stringvec& keywords, std::ostream& output, std::vector<std::string>& warnings)
+unsigned searchKeywords(stringvec& fileCollection, stringvec& results, stringvec& keywords, std::ostream& output, std::vector<std::string>& warnings)
 {
     unsigned nbOccurences=0;
     bool hasInsensitive = tamperInsensitive(keywords);
@@ -47,12 +47,13 @@ unsigned searchKeywords(stringvec& fileCollection, stringvec& keywords, std::ost
         {
             if(keywords.empty() || readFile(str1, keywords, hasInsensitive)){
                 output << str1 << endl;
+                results.push_back(str1);
                 nbOccurences++;
             }
         }
         catch(const FileException& e) {
             // we couldn't open this file, so let's add it to the warning list
-            warnings.emplace_back(str1);
+            warnings.push_back(str1);
         }
     }
 
@@ -69,7 +70,9 @@ unsigned searchKeywordsWithLines(stringvec& fileCollection, stringvec& results, 
     {
         try
         {
-            if(keywords.empty() || readFileWithLine(str1, results, keywords, output, hasInsensitive)){
+            if(keywords.empty() || readFileWithLine(str1, keywords, output, hasInsensitive)){
+                std::cout << str1 << std::endl;
+                results.push_back(str1);
                 nbOccurences++;
             }
         }
@@ -358,14 +361,14 @@ bool launchProgram(History& history)
     if(input == "1")
     {
         thread.join();
-        nb = searchKeywords(fileCollection, keywords, cout, warnings);
+        nb = searchKeywords(fileCollection, results, keywords, cout, warnings);
     }
     else if(input == "1+")
     {
         thread.join();
 
         if(keywords.empty())
-            nb = searchKeywords(fileCollection, keywords, cout, warnings);
+            nb = searchKeywords(fileCollection, results, keywords, cout, warnings);
         else
             nb = searchKeywordsWithLines(fileCollection, results, keywords, cout, warnings);
     }
